@@ -1,0 +1,63 @@
+{
+  "name": "@appcd/plugin-webpack",
+  "version": "1.0.0",
+  "description": "Manage Webpack builds via the Appc Daemon",
+  "main": "./dist/index.js",
+  "scripts": {
+    "app:build": "vuepress build app",
+    "app:dev": "vuepress dev app",
+    "build": "gulp build",
+    "coverage": "gulp coverage",
+    "dev": "gulp watch",
+    "docs": "gulp docs",
+    "prepare": "gulp build",
+    "test": "gulp test"
+  },
+  "keywords": [
+    "webpack",
+    "appcd"
+  ],
+  "author": "Axway Appcelerator",
+  "maintainers": [
+    "Jan Vennemann <jvennemann@axway.com>"
+  ],
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/appcelerator/appc-daemon-plugins",
+  "bugs": "https://github.com/appcelerator/appc-daemon-plugins/issues",
+  "repository": "https://github.com/appcelerator/appc-daemon-plugins",
+  "dependencies": {
+    "@babel/core": "^7.6.0",
+    "@soda/friendly-errors-webpack-plugin": "^1.7.1",
+    "acorn": "^7.1.0",
+    "acorn-walk": "^7.0.0",
+    "babel-loader": "^8.0.6",
+    "clean-webpack-plugin": "^3.0.0",
+    "copy-webpack-plugin": "^5.0.4",
+    "koa": "^2.7.0",
+    "koa-static": "^5.0.0",
+    "lodash.mapvalues": "^4.6.0",
+    "lodash.transform": "^4.6.0",
+    "minimist": "^1.2.0",
+    "pretty-time": "^1.1.0",
+    "read-pkg": "^5.2.0",
+    "semver": "^6.3.0",
+    "source-map-support": "^0.5.9",
+    "ti-js-config": "../../other/ti-js-config/",
+    "titanium-vue-template-compiler": "../titanium-vue/packages/titanium-vue-template-compiler/",
+    "vue-loader": "^15.7.1",
+    "webpack": "^4.39.3",
+    "webpack-chain": "^6.0.0",
+    "webpack-target-titanium": "^0.2.2"
+  },
+  "devDependencies": {
+    "appcd-gulp": "^2.2.0",
+    "gulp": "^4.0.2",
+    "nuxt": "^2.9.2"
+  },
+  "appcd": {
+    "appcdVersion": "3.x",
+    "inactivityTimeout": 600000,
+    "name": "webpack",
+    "type": "external"
+  }
+}
