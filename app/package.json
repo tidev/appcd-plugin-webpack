@@ -9,8 +9,7 @@
     "precommit": "npm run lint",
     "dev": "NODE_OPTIONS=--max-old-space-size=4096 nuxt",
     "build": "nuxt build",
-    "start": "nuxt start",
-    "generate": "nuxt generate"
+    "start": "nuxt start"
   },
   "dependencies": {
     "@nuxtjs/apollo": "^4.0.0-rc13.1",
