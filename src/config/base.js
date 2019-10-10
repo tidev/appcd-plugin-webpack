@@ -7,6 +7,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const webpack = require('webpack');
 const { GenerateAppJsPlugin, PlatformAwareFileSystemPlugin, titaniumTarget } = require('webpack-target-titanium');
 
+const { generateTranspileDepRegex } = require('../utils');
 const { ApiTrackerPlugin, StateNotifierPlugin } = require('../webpack');
 
 module.exports = function (api, options) {
@@ -48,9 +49,26 @@ module.exports = function (api, options) {
 				}
 			);
 
+		const transpileDepRegex = generateTranspileDepRegex(options.transpileDependencies);
 		config.module
 			.rule('compile')
 				.test(/\.js$/)
+				.exclude
+					.add(filepath => {
+						// transpile titanium-vdom and titanium-navigator
+						if (/node_modules\/titanium-(navigator|vdom)/.test(filepath)) {
+							return false;
+						}
+
+						// check if this is something the user explicitly wants to transpile
+						if (transpileDepRegex && transpileDepRegex.test(filepath)) {
+							return false;
+						}
+
+						// Don't transpile all other node_modules
+						return /node_modules/.test(filepath);
+					})
+					.end()
 				.use('babel')
 					.loader('babel-loader')
 					// TODO: Add @babel/preset-env settings based on platform
