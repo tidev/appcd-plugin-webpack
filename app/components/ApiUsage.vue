@@ -73,11 +73,15 @@ export default {
             value => value.name === symbolPart
           )
           if (childNodeIndex === -1) {
+            let type = 'symbol'
+            if (/^[A-Z][a-z]/.test(symbolPart)) {
+              type = 'namespace'
+            }
             const newNode = {
               id: id++,
               name: symbolPart,
               children: [],
-              type: 'symbol'
+              type
             }
             node.children.push(newNode)
             node.type = 'namespace'
