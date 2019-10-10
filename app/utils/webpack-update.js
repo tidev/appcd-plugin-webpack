@@ -23,8 +23,6 @@ export default async store => {
   try {
     const subscription = await client.subscribe('/webpack/latest/status')
     subscription.on('message', data => {
-      console.log('general status update')
-      console.log(data)
       const job = data.job
       store.commit('webpack/addOrUpdateJob', job)
     })

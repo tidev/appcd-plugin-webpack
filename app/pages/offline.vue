@@ -3,7 +3,7 @@
     <v-row justify="center">
       <v-col cols="6" xs="12">
         <v-alert color="error" dark icon="mdi-alert" border="left" prominent>
-          <h3 class="headline">Offline</h3>
+          <h3 class="headline">Daemon is offline</h3>
           <div>
             The Daemon appears to be offline. Make sure it is started.
           </div>
@@ -21,10 +21,9 @@ export default {
   mounted() {
     this.pingInterval = setInterval(async () => {
       try {
-        const result = await this.$axios.get('/appcd/status', {
+        await this.$axios.get('/appcd/status', {
           progress: false
         })
-        console.log(result)
         let redirectTo = this.$route.query.redirect || '/'
         if (redirectTo === this.$route.path) {
           redirectTo = '/'
