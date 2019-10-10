@@ -1,6 +1,21 @@
 <template>
   <dashboard-card class="card-stretch">
-    <v-card-title>API Usage</v-card-title>
+    <v-card-title class="justify-space-between">
+      <span>API Usage</span>
+
+      <v-tooltip left max-width="250">
+        <template v-slot:activator="{ on }">
+          <v-icon color="grey lighten-1" v-on="on">
+            mdi-information-outline
+          </v-icon>
+        </template>
+        <span>
+          In production builds, the native Titanium source code will be
+          optimized based on this list of APIs that were found in your
+          JavaScript code.
+        </span>
+      </v-tooltip>
+    </v-card-title>
     <v-card-text>
       <stats-loading v-if="!apiTreeItems.length" />
       <div v-else class="treeview-wrapper">
