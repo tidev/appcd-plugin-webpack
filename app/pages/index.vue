@@ -153,7 +153,7 @@ export default {
     try {
       await store.dispatch('webpack/fetchJobs')
     } catch (e) {
-      error({ message: 'Failed to get Webpack job list from daemon.' })
+      error({ message: 'Failed to get Webpack job list from Daemon.' })
     }
   },
   head: () => ({
