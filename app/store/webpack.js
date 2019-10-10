@@ -49,12 +49,14 @@ export const mutations = {
     Vue.set(state, 'jobs', [...jobs])
   },
   updateJob(state, update) {
-    Object.assign(state.currentJob, update)
+    state.currentJob = Object.assign({}, state.currentJob, update)
   },
   addOrUpdateJob(state, job) {
-    const existingJob = state.jobs.find(j => j.id === job.id)
-    if (existingJob) {
-      Object.assign(existingJob, job)
+    const existingJobIndex = state.jobs.findIndex(j => j.id === job.id)
+    if (existingJobIndex) {
+      const existingJob = state.jobs[existingJobIndex]
+      const updatedJob = Object.assign({}, existingJob, job)
+      Vue.set(state.jobs, existingJobIndex, updatedJob)
     } else {
       state.jobs.push(job)
     }
