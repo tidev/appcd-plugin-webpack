@@ -3,7 +3,6 @@
 const FriendlyErrorsPlugin = require('@soda/friendly-errors-webpack-plugin');
 const path = require('path');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
 const webpack = require('webpack');
 const { GenerateAppJsPlugin, PlatformAwareFileSystemPlugin, titaniumTarget } = require('webpack-target-titanium');
 
@@ -146,7 +145,11 @@ module.exports = function (api, options) {
 				}
 			]);
 		config.plugin('api-tracker')
-			.use(ApiTrackerPlugin);
+			.use(ApiTrackerPlugin, [
+				{
+					cwd: projectDir
+				}
+			]);
 		config.plugin('friendly-errors')
 			.use(FriendlyErrorsPlugin);
 		// state notifier needs to come last to capture all output from previous

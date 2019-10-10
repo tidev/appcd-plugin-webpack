@@ -1,7 +1,7 @@
 import fs from 'fs';
+import defaultsDeep from 'lodash.defaultsdeep';
 import path from 'path';
 import readPkg from 'read-pkg';
-import { loadConfig } from 'ti-js-config';
 
 import { loadModule, resolveModule } from '../loader';
 import HookContext from './index';
@@ -15,6 +15,12 @@ function lazyWatcher() {
 
 	return FSWatcher;
 }
+
+const defaults = () => ({
+	webpack: {
+		transpileDependencies: []
+	}
+});
 
 /**
  * A project scoped hook context.
@@ -34,9 +40,11 @@ export default class ProjectHookContext extends HookContext {
 		this.watchers = {};
 		const tiConfigPath = path.join(this.projectDir, 'ti.config.js');
 		if (fs.existsSync(tiConfigPath)) {
-			// FIXME: Replace with a trimmed down options object instead of the whole project config
-			this.options = loadConfig(this.projectDir);
-			this.options.platform = platform;
+			const config = defaultsDeep(require(tiConfigPath), defaults());
+			this.options = {
+				platform,
+				...config.webpack
+			};
 		}
 		this.validProjectTypes = [ 'vue' ];
 	}

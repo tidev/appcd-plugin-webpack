@@ -38,6 +38,7 @@ export default class WebpackJob extends EventEmitter {
 		this.progress = {
 			progress: 0
 		};
+		this.tiSymbols = {};
 
 		this.setOptions(options);
 	}
@@ -227,7 +228,7 @@ export default class WebpackJob extends EventEmitter {
 		this.progress = {
 			progress: 0
 		};
-		this.tiSymbols = null;
+		this.tiSymbols = {};
 		this.output = '';
 	}
 }

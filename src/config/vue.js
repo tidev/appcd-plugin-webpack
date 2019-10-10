@@ -3,6 +3,8 @@
 const titaniumCompiler = require('titanium-vue-template-compiler');
 const { VueLoaderPlugin } = require('vue-loader');
 
+const { TitaniumLoaderPlugin } = require('../webpack');
+
 module.exports = function (api, options) {
 	api.chainWebpack(config => {
 		config.module
@@ -27,5 +29,10 @@ module.exports = function (api, options) {
 
 		config.plugin('vue-loader')
 			.use(VueLoaderPlugin);
+
+		config.plugin('titanium-loader')
+			.use(TitaniumLoaderPlugin, [
+				options
+			]);
 	});
 };

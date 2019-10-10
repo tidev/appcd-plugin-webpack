@@ -22,3 +22,17 @@ export function removeAfter(delimiter, str) {
 export function removeBefore(delimiter, str) {
 	return last(str.split(delimiter)) || '';
 }
+
+const camelizeRE = /-(\w)/g;
+export function camelize(str) {
+	return str.replace(camelizeRE, (_, c) => (c ? c.toUpperCase() : ''));
+}
+
+export function capitalize(str) {
+	return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+const hyphenateRE = /\B([A-Z])/g;
+export function hyphenate(str) {
+	return str.replace(hyphenateRE, '-$1').toLowerCase();
+}

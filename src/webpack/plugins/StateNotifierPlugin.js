@@ -1,4 +1,4 @@
-import { sendData } from '../utils';
+import { sendData } from '../../utils';
 
 export class StateNotifierPlugin {
 	apply(compiler) {

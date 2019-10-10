@@ -1,5 +1,3 @@
-import semver from 'semver';
-
 /**
  * A fallback for require.resolve.
  *
