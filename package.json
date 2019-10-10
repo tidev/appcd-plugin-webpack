@@ -4,8 +4,8 @@
   "description": "Manage Webpack builds via the Appc Daemon",
   "main": "./dist/index.js",
   "scripts": {
-    "app:build": "vuepress build app",
-    "app:dev": "vuepress dev app",
+    "app:build": "cd app && yarn run build",
+    "app:dev": "cd app && yarn run dev",
     "build": "gulp build",
     "coverage": "gulp coverage",
     "dev": "gulp watch",
