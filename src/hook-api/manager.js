@@ -40,7 +40,8 @@ export default class HookManager {
 			apply: require(id)
 		});
 		this.builtInHookAppliers = [
-			'../config/base'
+			'../config/base',
+			'../config/prod'
 		].map(idToHook);
 	}
 
