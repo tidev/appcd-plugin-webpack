@@ -143,8 +143,7 @@ module.exports = function (api, options) {
 				{
 					dry: false,
 					cleanOnceBeforeBuildPatterns: [
-						path.join(outputDirectory, '*.*'),
-						path.join(projectDir, 'platform')
+						'**/*'
 					],
 					dangerouslyAllowCleanPatternsOutsideProject: true
 				}
