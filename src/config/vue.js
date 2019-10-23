@@ -7,6 +7,11 @@ const { TitaniumLoaderPlugin } = require('../webpack');
 
 module.exports = function (api, options) {
 	api.chainWebpack(config => {
+		config
+			.entry('main')
+				.add('./src/main.js')
+				.end();
+
 		config.module
 			.rule('compile')
 				.exclude

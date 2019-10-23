@@ -23,9 +23,6 @@ module.exports = function (api, options) {
 			.context(path.join(projectDir, 'app'))
 			.target(titaniumTarget)
 			.mode('development')
-			.entry('main')
-				.add('./src/main.js')
-				.end()
 			/*
 			.entry('ti.main')
 				.add('/Users/jvennemann/Library/Application Support/Titanium/mobilesdk/osx/8.2.0/common/Resources/ti.main.js')
