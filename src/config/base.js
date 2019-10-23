@@ -45,10 +45,12 @@ module.exports = function (api, options) {
 				}
 			);
 
+		// babel-loader ------------------------------------------------------------
+
 		const transpileDepRegex = generateTranspileDepRegex(options.transpileDependencies);
-		config.module
-			.rule('compile')
-				.test(/\.js$/)
+		const jsRule = config.module
+			.rule('js')
+				.test(/\.m?js$/)
 				.exclude
 					.add(filepath => {
 						// transpile titanium-vdom and titanium-navigator
@@ -65,12 +67,30 @@ module.exports = function (api, options) {
 						return /node_modules/.test(filepath);
 					})
 					.end()
-				.use('babel')
-					.loader('babel-loader')
-					// TODO: Add @babel/preset-env settings based on platform
-					.options({
-						cwd: path.join(projectDir, 'app')
-					});
+				.use('cache-loader')
+					.loader('cache-loader')
+					.options(api.generateCacheConfig('babel-loader', {
+						'@babel/core': require('@babel/core/package.json').version,
+						'babel-loader': require('babel-loader/package.json').version
+					}, [
+						'babel.config.js'
+					]))
+					.end();
+
+		jsRule
+			.use('babel-loader')
+				.loader('babel-loader')
+				// TODO: Add @babel/preset-env settings based on platform
+				.options({
+					cwd: path.join(projectDir, 'app'),
+					plugins: [
+						[ require.resolve('babel-plugin-transform-titanium'), {
+							deploytype: 'development',
+							platform: options.platform,
+							target: 'simulator'
+						} ]
+					]
+				});
 
 		// static assets -----------------------------------------------------------
 

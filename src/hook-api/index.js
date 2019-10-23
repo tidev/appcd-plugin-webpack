@@ -1,3 +1,5 @@
+import fs from 'fs';
+import hash from 'hash-sum';
 import path from 'path';
 
 /**
@@ -42,5 +44,58 @@ export default class HookApi {
 	 */
 	resolve(..._path) {
 		return path.resolve(this.getCwd(), ..._path);
+	}
+
+	/**
+	 * Generates a new configuration for cache-loader based on the passed
+	 * identifier object and the content of any additional config files.
+	 *
+	 * @param {string} name Unique name for the cache
+	 * @param {object} baseIdentifiers Custom object to include in hash calculation
+	 * @param {Array<string>} configFiles List of config files to include in hash calculation
+	 * @return {Object} Config object for cache loader with cache directory and identifier
+	 */
+	generateCacheConfig(name, baseIdentifiers, configFiles = []) {
+		const cacheDirectory = this.resolve('build', '.cache', name);
+
+		const hashSource = {
+			baseIdentifiers,
+			'webpack-plugin': require('../../package.json').version,
+			'cache-loader': require('cache-loader/package.json').version,
+			env: process.env.NODE_ENV,
+			configFiles: ''
+		};
+
+		configFiles = configFiles.concat([
+			'package-lock.json',
+			'yarn.lock'
+		]);
+
+		const readConfig = file => {
+			const configPath = this.resolve(file);
+			if (!fs.existsSync(configPath)) {
+				return null;
+			}
+
+			if (configPath.endsWith('js')) {
+				try {
+					return JSON.stringify(require(configPath));
+				} catch (e) {
+					return fs.readFileSync(configPath, 'utf-8');
+				}
+			} else {
+				return fs.readFileSync(configPath, 'utf-8');
+			}
+		};
+
+		for (const file of configFiles) {
+			const content = readConfig(file);
+			if (content) {
+				hashSource.configFiles += content.replace(/\r\n?/g, '\n');
+			}
+		}
+
+		const cacheIdentifier = hash(hashSource);
+		return { cacheDirectory, cacheIdentifier };
 	}
 }

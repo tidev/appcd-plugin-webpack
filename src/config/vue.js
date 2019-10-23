@@ -13,7 +13,7 @@ module.exports = function (api, options) {
 				.end();
 
 		config.module
-			.rule('compile')
+			.rule('js')
 				.exclude
 					.add(filepath => {
 						// always transpile js in vue files
