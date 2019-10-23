@@ -9,6 +9,7 @@ export class StateNotifierPlugin {
 			sendData('state', 'compiling');
 		});
 		compiler.hooks.invalid.tap('StateNotifier:invalid', fileName => {
+			console.log('invalid', fileName);
 			sendData('invalid', fileName);
 		});
 		compiler.hooks.done.tap('StateNotifier:done', stats => {
