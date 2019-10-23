@@ -77,7 +77,7 @@ export default class WebpackJob extends EventEmitter {
 	}
 
 	setOptions(newOptions) {
-		this.options = Object.assign({}, { env: {} }, newOptions);
+		this.options = Object.assign({}, { modules: [] }, newOptions);
 
 		const { platform, projectPath, type } = this.options;
 		this.name = projectPath.split('/').pop();
@@ -95,9 +95,12 @@ export default class WebpackJob extends EventEmitter {
 
 		const args = [
 			path.resolve(__dirname, './tasks/build.js'),
-			'--project', this.options.projectPath,
-			'--platform', this.options.platform
+			'--project', this.projectPath,
+			'--platform', this.platform,
 		];
+		for (const module of this.options.modules) {
+			args.push('-m', module.id);
+		}
 		if (this.options.watch) {
 			args.push('--watch');
 		}

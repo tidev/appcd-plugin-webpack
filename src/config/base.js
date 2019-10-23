@@ -4,7 +4,12 @@ const FriendlyErrorsPlugin = require('@soda/friendly-errors-webpack-plugin');
 const path = require('path');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const webpack = require('webpack');
-const { GenerateAppJsPlugin, PlatformAwareFileSystemPlugin, titaniumTarget } = require('webpack-target-titanium');
+const {
+	GenerateAppJsPlugin,
+	PlatformAwareFileSystemPlugin,
+	titaniumTarget,
+	TitaniumExternalsPlugins
+} = require('webpack-target-titanium');
 
 const { generateTranspileDepRegex } = require('../utils');
 const { ApiTrackerPlugin, StateNotifierPlugin } = require('../webpack');
@@ -33,17 +38,7 @@ module.exports = function (api, options) {
 				.filename('[name].js')
 				.libraryTarget('commonjs2')
 				.globalObject('global')
-				.end()
-			.externals(
-				(context, request, callback) => {
-					// TODO: automatically externalize used native modules
-					if (request === './app' || request === 'com.appcelerator.aca') {
-						return callback(null, `commonjs ${request}`);
-					}
-
-					callback();
-				}
-			);
+				.end();
 
 		// babel-loader ------------------------------------------------------------
 
@@ -158,6 +153,10 @@ module.exports = function (api, options) {
 				{
 					'process.env.TARGET_PLATFORM': JSON.stringify(platformName)
 				}
+			]);
+		config.plugin('titanium-externals')
+			.use(TitaniumExternalsPlugins, [
+				options.modules
 			]);
 		config.plugin('app.js')
 			.use(GenerateAppJsPlugin, [
