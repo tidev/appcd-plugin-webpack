@@ -23,6 +23,9 @@ module.exports = function (api, options) {
 				.end();
 
 		config.module
+			.noParse(/^(titanium-vue|vue-router|vuex|vuex-router-sync)$/);
+
+		config.module
 			.rule('js')
 				.exclude
 					.add(filepath => {
