@@ -72,17 +72,25 @@ module.exports = function (api, options) {
 						cwd: path.join(projectDir, 'app')
 					});
 
+		// static assets -----------------------------------------------------------
+
 		config.module
 			.rule('images')
 				.test(/\.(png|jpe?g|gif|webp)(\?.*)?$/)
 				.use('file-loader')
-					.loader('file-loader');
+					.loader('file-loader')
+					.options({
+						name: '[path][name].[ext]'
+					});
 
 		config.module
 			.rule('media')
 				.test(/\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/)
 				.use('file-loader')
-					.loader('file-loader');
+					.loader('file-loader')
+					.options({
+						name: '[path][name].[ext]'
+					});
 
 		config.module
 			.rule('fonts')
