@@ -12,6 +12,16 @@ module.exports = function (api, options) {
 				.add('./src/main.js')
 				.end();
 
+		config.resolve
+			.alias
+				.set('@', api.resolve('app/src'))
+				.set('~', api.resolve('app/assets'))
+				.set('vue$', 'titanium-vue')
+				.end()
+			.extensions
+				.merge([ '.vue' ])
+				.end();
+
 		config.module
 			.rule('js')
 				.exclude

@@ -6,7 +6,7 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const webpack = require('webpack');
 const {
 	GenerateAppJsPlugin,
-	PlatformAwareFileSystemPlugin,
+	PlatformResolverPlugin,
 	titaniumTarget,
 	TitaniumExternalsPlugins
 } = require('webpack-target-titanium');
@@ -39,6 +39,26 @@ module.exports = function (api, options) {
 				.libraryTarget('commonjs2')
 				.globalObject('global')
 				.end();
+
+		// resolve -----------------------------------------------------------------
+
+		config.resolve
+			.extensions
+				.merge([ '.mjs', '.js', '.json' ])
+				.end()
+			.modules
+				.add('node_modules')
+				.add(api.resolve('node_modules'))
+				.add(resolveLocal('node_modules'))
+				.end()
+			.plugin('platform-resolver')
+				.use(new PlatformResolverPlugin('described-relative', platformName, 'raw-file'));
+
+		config.resolveLoader
+			.modules
+				.add('node_modules')
+				.add(api.resolve('node_modules'))
+				.add(resolveLocal('node_modules'));
 
 		// babel-loader ------------------------------------------------------------
 
@@ -116,25 +136,7 @@ module.exports = function (api, options) {
 						name: '[path][name].[ext]'
 					});
 
-		config.resolve
-			.alias
-				.set('@', api.resolve('app/src'))
-				.set('~', api.resolve('app/assets'))
-				.set('vue$', 'titanium-vue')
-				.end()
-			.extensions
-				.merge([ '.mjs', '.js', '.vue', '.json' ])
-				.end()
-			.modules
-				.add('node_modules')
-				.add(api.resolve('node_modules'))
-				.add(resolveLocal('node_modules'));
-
-		config.resolveLoader
-			.modules
-				.add('node_modules')
-				.add(api.resolve('node_modules'))
-				.add(resolveLocal('node_modules'));
+		// plugins -----------------------------------------------------------------
 
 		config.plugin('clean')
 			.use(CleanWebpackPlugin, [
@@ -161,12 +163,6 @@ module.exports = function (api, options) {
 		config.plugin('app.js')
 			.use(GenerateAppJsPlugin, [
 				[ 'main' ]
-			]);
-		config.plugin('platform-filesystem')
-			.use(PlatformAwareFileSystemPlugin, [
-				{
-					platform: platformName
-				}
 			]);
 		config.plugin('api-tracker')
 			.use(ApiTrackerPlugin, [
