@@ -41,7 +41,7 @@ function resolveFallback (request, options) {
 	return filename;
 }
 
-const resolve = resolveFallback;
+const resolve = require.resolve;
 
 /**
  * Resolves a module relative to the given context.

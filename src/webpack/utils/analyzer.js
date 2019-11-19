@@ -29,9 +29,9 @@ export function analyzeBundle(stats, assetSources, outputPath) {
 		const originalName = asset.name;
 		asset.name = asset.name.replace(FILENAME_QUERY_REGEXP, '');
 		if (originalName !== asset.name && assetSources.has(originalName)) {
-			const assetSource = this.assetSources.get(originalName);
-			this.assetSources.delete(originalName);
-			this.assetSources.set(asset.name, assetSource);
+			const assetSource = assetSources.get(originalName);
+			assetSources.delete(originalName);
+			assetSources.set(asset.name, assetSource);
 		}
 
 		// Separate JS assets

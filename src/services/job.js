@@ -1,11 +1,11 @@
 import Dispatcher from 'appcd-dispatcher';
 import { AppcdError, codes, Response } from 'appcd-response';
-import WebpackJob from './WebpackJob';
+import BuildJob from '../job/build-job';
 
 /**
  * Service to start and stop Webpack build jobs
  */
-export default class WebpackService extends Dispatcher {
+export default class JobService extends Dispatcher {
 	constructor(jobManager) {
 		super();
 
@@ -30,7 +30,7 @@ export default class WebpackService extends Dispatcher {
 					job.setOptions(options);
 				}
 			} else if (options) {
-				job = new WebpackJob(jobIdentifier, options);
+				job = new BuildJob(jobIdentifier, options);
 				this.jobManager.addJob(job);
 			} else {
 				ctx.response = new AppcdError('Invalid request data');

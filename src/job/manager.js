@@ -1,9 +1,9 @@
 import EventEmitter from 'events';
 
 /**
- * Manager for Webpack jobs. Handles starting and stopping of jobs.
+ * Manager for Webpack build jobs. Handles starting and stopping of jobs.
  */
-export default class WebpackJobManager extends EventEmitter {
+export default class JobManager extends EventEmitter {
 	constructor() {
 		super();
 

@@ -1,5 +1,5 @@
 const path = require('path');
-const compiler = require('titanium-vue-template-compiler');
+const { getOptions } = require('loader-utils');
 const { registerTitaniumElements, TitaniumElementRegistry } = require('titanium-vdom');
 
 const { apiTracker } = require('../utils/api-tracker');
@@ -34,6 +34,7 @@ module.exports = async function titaniumLoader(content, sourceMap) {
 		});
 	});
 
+	const { compiler } = getOptions(this);
 	const file = (await readFile(this.resourcePath)).toString('utf8');
 	const component = compiler.parseComponent(file);
 	if (component.template) {

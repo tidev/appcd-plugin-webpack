@@ -3,36 +3,27 @@ if (!Error.prepareStackTrace) {
 	require('source-map-support/register');
 }
 
-import WebpackJobManager from './WebpackJobManager';
-import WebpackService from './WebpackService';
-import WebpackStatusService from './WebpackStatusService';
-import WebpackWebService from './WebpackWebService';
-import HookManager from './hook-api/manager';
-import { registerHooks, unregisterHooks } from './hooks';
+import JobManager from './job/manager';
+import JobService from './services/job';
+import StatusService from './services/status';
+import WebUiService from './services/web-ui';
 
-// FIXME: The appcd global is unique for each plugin so this should obviously
-// be done somewhere in the appcd-plugin package
-appcd.hooks = new HookManager();
-
-const jobManager = new WebpackJobManager();
-const webpackService = new WebpackService(jobManager);
-const webpackStatusService = new WebpackStatusService(jobManager);
-const webpackWebService = new WebpackWebService();
+const jobManager = new JobManager();
+const jobService = new JobService(jobManager);
+const statusService = new StatusService(jobManager);
+const uiService = new WebUiService();
 
 export async function activate(config) {
-	registerHooks(appcd.hooks);
+	appcd.register('/status', statusService);
 
-	appcd.register('/status', webpackStatusService);
-	webpackWebService.activate(config);
-	appcd.register('/web', webpackWebService);
-	await webpackService.activate(config);
-	appcd.register('/', webpackService);
+	uiService.activate();
+	appcd.register('/web', uiService);
+
+	jobService.activate(config);
+	appcd.register('/', jobService);
 }
 
 export async function deactivate() {
-	webpackWebService.deactivate();
-
-	unregisterHooks(appcd.hooks);
-
 	jobManager.stopAll();
+	uiService.deactivate();
 }

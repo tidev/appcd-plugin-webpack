@@ -4,7 +4,7 @@ Appcd plugin to manage Webpack build tasks.
 
 ## Endpoints
 
-This plugin registers the following endpints.
+This plugin registers the following endpoints:
 
 ### `/start`
 

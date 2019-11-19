@@ -1,11 +1,13 @@
 /* eslint indent: "off" */
 
-const titaniumCompiler = require('titanium-vue-template-compiler');
 const { VueLoaderPlugin } = require('vue-loader');
-
 const { TitaniumLoaderPlugin } = require('../webpack');
 
 module.exports = function (api, options) {
+	// set target platform for titanium-vue-template-compiler
+	process.env.TARGET_PLATFORM = options.platform;
+	const titaniumCompiler = api.requirePeer('titanium-vue-template-compiler');
+
 	api.chainWebpack(config => {
 		config
 			.entry('main')
@@ -50,7 +52,10 @@ module.exports = function (api, options) {
 
 		config.plugin('titanium-loader')
 			.use(TitaniumLoaderPlugin, [
-				options
+				{
+					...options,
+					compiler: titaniumCompiler
+				}
 			]);
 	});
 };

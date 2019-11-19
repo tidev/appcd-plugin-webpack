@@ -8,8 +8,7 @@ export class StateNotifierPlugin {
 		compiler.hooks.watchRun.tap('StateNotifier:watchRun', _compiler => {
 			sendData('state', 'compiling');
 		});
-		compiler.hooks.invalid.tap('StateNotifier:invalid', fileName => {
-			console.log('invalid', fileName);
+		compiler.hooks.invalid.tap('StateNotifier:invalid', (fileName, changeTime) => {
 			sendData('invalid', fileName);
 		});
 		compiler.hooks.done.tap('StateNotifier:done', stats => {

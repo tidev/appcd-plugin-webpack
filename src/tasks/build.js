@@ -2,21 +2,25 @@ import webpack from 'webpack';
 import Config from 'webpack-chain';
 
 import HookManager from '../hook-api/manager';
-import { registerHooks } from '../hooks';
 import { DashboardPlugin } from '../webpack';
-import { resolveArgs } from '../utils';
+import { loadProjectOptions, registerHooks, resolveArgs } from '../utils';
 
 const args = resolveArgs();
 
-const projectPath = args.project;
+const projectDir = args.project;
 const platform = args.platform;
-
-// set target platform for titanium-vue-template-compiler
-process.env.TARGET_PLATFORM = platform;
+const watch = args.watch;
+const modules = args.modules;
 
 const hookManager = new HookManager();
 registerHooks(hookManager);
-const hooks = hookManager.getHookContextForProject(projectPath, platform);
+
+const projectOptions = loadProjectOptions(projectDir, {
+	platform,
+	modules,
+	watch
+});
+const hooks = hookManager.getHookContextForProject(projectDir, projectOptions);
 
 const config = new Config();
 hooks.applyHook('chainWebpack', config);
@@ -26,7 +30,7 @@ if (args.watch) {
 	webpackConfig.watch = true;
 }
 
-webpackConfig.plugins.push(new DashboardPlugin(projectPath));
+webpackConfig.plugins.push(new DashboardPlugin(projectDir));
 
 webpack(webpackConfig, (err, stats) => {
 	if (err) {

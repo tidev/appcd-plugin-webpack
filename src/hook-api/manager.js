@@ -45,21 +45,20 @@ export default class HookManager {
 		].map(idToHook);
 	}
 
-	getHookContextForProject(projectDir, platform) {
+	getHookContextForProject(projectDir, options) {
 		if (this.hookContexts.has(projectDir)) {
 			return this.hookContexts.get(projectDir);
 		}
 
-		const context = this.createProjectHookContext(projectDir, platform);
+		const context = this.createProjectHookContext(projectDir, options);
 		this.builtInHookAppliers.map(({ id, apply }) => context.applyHookFile(id, apply));
-		context.loadProjectTypeHookFile();
-		context.loadAndApplyLocalHookFiles();
+		context.initialize();
 
 		return context;
 	}
 
-	createProjectHookContext(projectDir, platform) {
-		const context = new ProjectHookContext(projectDir, platform);
+	createProjectHookContext(projectDir, options) {
+		const context = new ProjectHookContext(projectDir, options);
 		this.hookContexts.set(projectDir, context);
 		this.hookClasses.forEach((hookClass, name) => {
 			const hook = new hookClass(name);

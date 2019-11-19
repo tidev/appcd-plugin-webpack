@@ -47,6 +47,30 @@ export default class HookApi {
 	}
 
 	/**
+	 * Resolves a peer dependency from the current working directory.
+	 *
+	 * @param {string} request module name or path
+	 * @return {string} resolved module path
+	 */
+	resolvePeer(request) {
+		const modulePath = require.resolve(request, {
+			paths: [ this.getCwd() ]
+		});
+		return modulePath;
+	}
+
+	/**
+	 * Requires a peer dependency from the current working directory.
+	 *
+	 * @param {string} request module name or path
+	 * @return {*} exported module content
+	 */
+	requirePeer(request) {
+		// eslint-disable-next-line security/detect-non-literal-require
+		return require(this.resolvePeer(request));
+	}
+
+	/**
 	 * Generates a new configuration for cache-loader based on the passed
 	 * identifier object and the content of any additional config files.
 	 *
@@ -79,6 +103,7 @@ export default class HookApi {
 
 			if (configPath.endsWith('js')) {
 				try {
+					// eslint-disable-next-line security/detect-non-literal-require
 					return JSON.stringify(require(configPath));
 				} catch (e) {
 					return fs.readFileSync(configPath, 'utf-8');

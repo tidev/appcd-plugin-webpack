@@ -1,19 +1,26 @@
 import EventEmitter from 'events';
 import path from 'path';
+import defaultsDeep from 'lodash.defaultsdeep';
 
-import { processStats } from './utils/stats';
+import { validate, defaults } from './options';
+import { processStats } from '../utils/stats';
 
+const defaultJsonFields = [
+	'id',
+	'options',
+	'name',
+	'projectPath',
+	'projectType',
+	'platform',
+	'state',
+	'history'
+];
 const jsonTemplateConfig = {
-	default: [ 'id', 'name', 'projectPath', 'type', 'platform', 'state', 'history' ],
+	default: defaultJsonFields,
 	detail: [
-		'id',
-		'name',
-		'projectPath',
-		'type',
-		'platform',
-		'state',
+		...defaultJsonFields,
+		'deployType',
 		'progress',
-		'history',
 		'stats',
 		'output',
 		'tiSymbols'
@@ -25,11 +32,11 @@ const jsonTemplateConfig = {
  *
  * Uses webpack's Node api to run a webpack compilation
  */
-export default class WebpackJob extends EventEmitter {
+export default class BuildJob extends EventEmitter {
 	constructor(id, options) {
 		super();
 
-		this._state = WebpackJob.STATE_STOPPED;
+		this._state = BuildJob.STATE_STOPPED;
 		this.id = id;
 		this.pid = null;
 		this.output = '';
@@ -77,13 +84,21 @@ export default class WebpackJob extends EventEmitter {
 	}
 
 	setOptions(newOptions) {
-		this.options = Object.assign({}, { modules: [] }, newOptions);
+		newOptions = defaultsDeep(newOptions, this.options);
+		this.options = defaultsDeep(newOptions, defaults());
+		validate(this.options);
 
-		const { platform, projectPath, type } = this.options;
+		const {
+			projectPath,
+			projectType,
+			platform,
+			deployType
+		} = this.options;
 		this.name = projectPath.split('/').pop();
 		this.projectPath = projectPath;
+		this.projectType = projectType;
 		this.platform = platform;
-		this.type = type;
+		this.deployType = deployType;
 	}
 
 	async start() {
@@ -93,20 +108,28 @@ export default class WebpackJob extends EventEmitter {
 
 		this.isStarting = true;
 		this.cleanupJobData();
+		let taskName = 'build';
+		// @TODO switch to serve task for non-production builds
 
 		const args = [
-			path.resolve(__dirname, './tasks/build.js'),
+			path.resolve(__dirname, '..', 'tasks', `${taskName}.js`),
 			'--project', this.projectPath,
-			'--platform', this.platform,
+			'--platform', this.platform
 		];
-		for (const module of this.options.modules) {
-			args.push('-m', module.id);
+
+		for (const moduleName of this.options.modules) {
+			args.push('-m', moduleName);
 		}
-		if (this.options.watch) {
+
+		let watch = this.deployType !== 'production';
+		if (typeof this.options.watch !== 'undefined') {
+			watch = this.options.watch;
+		}
+		if (watch) {
 			args.push('--watch');
 		}
 
-		this.output = `\u001b[90m$ appcd-plugin-webpack build ${args.slice(1).join(' ')}\u001b[0m\n\n`;
+		this.output = `\u001b[90m$ appcd-plugin-webpack ${taskName} ${args.slice(1).join(' ')}\u001b[0m\n\n`;
 
 		const startTimeout = setTimeout(() => {
 			throw new Error('Webpack build failed to spawn within 5 sec.');
@@ -115,7 +138,10 @@ export default class WebpackJob extends EventEmitter {
 		const { response } = await appcd.call('/appcd/subprocess/spawn/node', {
 			data: {
 				args,
-				ipc: true
+				ipc: true,
+				env: Object.assign({}, process.env, {
+					NODE_ENV: this.deployType
+				})
 			}
 		});
 		response.on('data', data => {
@@ -123,7 +149,7 @@ export default class WebpackJob extends EventEmitter {
 				case 'spawn': {
 					clearTimeout(startTimeout);
 					this.pid = data.pid;
-					this.state = WebpackJob.STATE_STARTED;
+					this.state = BuildJob.STATE_STARTED;
 					this.isStarting = false;
 					return Promise.resolve();
 				}
@@ -143,9 +169,9 @@ export default class WebpackJob extends EventEmitter {
 				}
 				case 'exit': {
 					if (data.code && data.code !== 0) {
-						this.state = WebpackJob.STATE_ERROR;
+						this.state = BuildJob.STATE_ERROR;
 					} else {
-						this.state = WebpackJob.STATE_STOPPED;
+						this.state = BuildJob.STATE_STOPPED;
 					}
 				}
 			}
@@ -159,7 +185,7 @@ export default class WebpackJob extends EventEmitter {
 
 		await appcd.call(`/appcd/subprocess/kill/${this.pid}`);
 		this.pid = null;
-		this.state = WebpackJob.STATE_STOPPED;
+		this.state = BuildJob.STATE_STOPPED;
 		this.cleanupJobData();
 	}
 
@@ -175,11 +201,11 @@ export default class WebpackJob extends EventEmitter {
 			}
 			case 'state': {
 				if (message.data === 'ready') {
-					this.state = WebpackJob.STATE_READY;
+					this.state = BuildJob.STATE_READY;
 				} else if (message.data === 'error') {
-					this.state = WebpackJob.STATE_ERROR;
+					this.state = BuildJob.STATE_ERROR;
 				} else if (message.data === 'compiling') {
-					this.state = WebpackJob.STATE_BUILDING;
+					this.state = BuildJob.STATE_BUILDING;
 				}
 				break;
 			}

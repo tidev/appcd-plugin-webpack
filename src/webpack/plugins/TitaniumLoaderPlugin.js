@@ -20,7 +20,10 @@ export class TitaniumLoaderPlugin {
 
 			const vueRule = rules[vueRuleIndex];
 			vueRule.use.unshift({
-				loader: require.resolve('../loaders/titanium-vue-loader')
+				loader: require.resolve('../loaders/titanium-vue-loader'),
+				options: {
+					compiler: this.options.compiler
+				}
 			});
 
 			compiler.options.module.rules = rules;

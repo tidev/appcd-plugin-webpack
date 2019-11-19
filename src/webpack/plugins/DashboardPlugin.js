@@ -23,6 +23,7 @@ export class DashboardPlugin extends ProgressPlugin {
 
 		this.cwd = cwd;
 		this.lastProgressUpdate = Date.now();
+		this.assetSources = new Map();
 
 		// Override handler from base ProgressPlugin
 		this.handler = (percent, message, ...details) => {

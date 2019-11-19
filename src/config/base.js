@@ -16,7 +16,7 @@ const { ApiTrackerPlugin, StateNotifierPlugin } = require('../webpack');
 
 module.exports = function (api, options) {
 	const projectDir = api.getCwd();
-	const outputDirectory = path.join(projectDir, 'Resources');
+	const outputDirectory = api.resolve('Resources');
 	const platformName = options.platform;
 
 	const resolveLocal = (...args) => {

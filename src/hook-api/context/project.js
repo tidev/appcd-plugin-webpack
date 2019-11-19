@@ -1,5 +1,4 @@
 import fs from 'fs';
-import defaultsDeep from 'lodash.defaultsdeep';
 import path from 'path';
 import readPkg from 'read-pkg';
 
@@ -10,17 +9,11 @@ import HookContext from './index';
 let FSWatcher;
 function lazyWatcher() {
 	if (!FSWatcher) {
-		FSWatcher = require('appcd-fswatcher');
+		FSWatcher = require('appcd-fswatcher').default;
 	}
 
 	return FSWatcher;
 }
-
-const defaults = () => ({
-	webpack: {
-		transpileDependencies: []
-	}
-});
 
 /**
  * A project scoped hook context.
@@ -32,39 +25,40 @@ const defaults = () => ({
  * inside the project's `package.json`.
  */
 export default class ProjectHookContext extends HookContext {
-	constructor(projectDir, platform, watch = false) {
+	/**
+	 * Constructs a new project hook context scoped to the given
+	 * project dir and with the specified options.
+	 *
+	 * @param {string} projectDir Project directory
+	 * @param {Object} options Project options
+	 */
+	constructor(projectDir, options) {
 		super();
 
 		this.projectDir = projectDir;
-		this.shouldWatch = watch;
+		this.shouldWatch = options.watch;
 		this.watchers = {};
-		const tiConfigPath = path.join(this.projectDir, 'ti.config.js');
-		if (fs.existsSync(tiConfigPath)) {
-			const config = defaultsDeep(require(tiConfigPath), defaults());
-			this.options = {
-				platform,
-				...config.webpack
-			};
-		}
-		this.validProjectTypes = [ 'vue' ];
+		this.options = options;
 	}
 
 	getCwd() {
 		return this.projectDir;
 	}
 
+	initialize() {
+		this.loadProjectTypeHookFile();
+		this.loadLocalHookFiles();
+	}
+
 	loadProjectTypeHookFile() {
 		const projectType = this.options.type;
-		if (!this.validProjectTypes.includes(projectType)) {
-			throw new Error(`Project type must be one of ${this.validProjectTypes.join(',')}. Received ${projectType}.`);
-		}
 		const id = `config/${projectType}`;
 		const configHookFile = `../../${id}`;
 		const apply = require(configHookFile);
 		this.applyHookFile(`built-in:${id}`, apply);
 	}
 
-	loadAndApplyLocalHookFiles() {
+	loadLocalHookFiles() {
 		const pkgPath = path.join(this.projectDir, 'package.json');
 		if (this.shouldWatch) {
 			const FSWatcher = lazyWatcher();
@@ -103,6 +97,7 @@ export default class ProjectHookContext extends HookContext {
 					return;
 				}
 				if (this.shouldWatch) {
+					const FSWatcher = lazyWatcher();
 					const watcher = new FSWatcher(fullPath);
 					watcher.on('change', e => {
 						console.log(`${hookId} changed`);

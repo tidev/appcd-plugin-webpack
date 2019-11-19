@@ -37,24 +37,24 @@ export class ApiTrackerPlugin {
 						const shortExpression = tiExpression.substring(9); // Drop leading 'Titanium.'
 						if (!symbols.has(shortExpression)) {
 							symbols.add(shortExpression);
-							parser.hooks.expressionAnyMember
-								.for(tiExpression)
-								.tap('ApiTracker:expressionAnyMember', handler);
-							parser.hooks.expressionAnyMember
-								.for(tiExpression.replace(/^Titanium/, 'Ti'))
-								.tap('ApiTracker:expressionAnyMember', handler);
 						}
 					};
-					parser.hooks.expressionAnyMember
-						.for('Titanium')
-						.tap('ApiTracker:expressionAnyMember', handler);
-					parser.hooks.expressionAnyMember
-						.for('Ti')
-						.tap('ApiTracker:expressionAnyMember', handler);
+					// We need to cheat the HookMap here since we don't know the expressions in advance
+					parser.hooks.expressionAnyMember.get = function (key) {
+						const hook = this._map.get(key);
+						if (hook !== undefined) {
+							return hook;
+						}
+
+						const newHook = this._factory(key);
+						this._map.set(key, newHook);
+						newHook.tap('ApiTracker', handler);
+						return newHook;
+					};
 				});
 
 				if (this.watchRun) {
-					normalModuleFactory.hooks.module.tap('ApiTrack', module => {
+					normalModuleFactory.hooks.module.tap('ApiTracker', module => {
 						this.changedModules.push(this.resolvePath(module.userRequest));
 					});
 				}

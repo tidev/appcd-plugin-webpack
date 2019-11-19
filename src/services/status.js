@@ -4,7 +4,7 @@ import { AppcdError, codes, Response } from 'appcd-response';
 /**
  * Service dispatcher endpoint that publishes status changes emitted by a Webpack job
  */
-export default class WebpackStatusService extends ServiceDispatcher {
+export default class StatusService extends ServiceDispatcher {
 	constructor(jobManager) {
 		super();
 
@@ -38,7 +38,7 @@ export default class WebpackStatusService extends ServiceDispatcher {
 			this.addEventListenerForSubscription(job, 'state', (job, state) => publish({ event: 'state', state }), sid);
 			this.addEventListenerForSubscription(job, 'progress', progress => publish({ event: 'progress', progress }), sid);
 			this.addEventListenerForSubscription(job, 'output', output => publish({ event: 'output', output }), sid);
-			this.addEventListenerForSubscription(job, 'api-usage', symbols => publish({ event: 'api-usage', symbols }), sid);
+			this.addEventListenerForSubscription(job, 'api-usage', tiSymbols => publish({ event: 'api-usage', tiSymbols }), sid);
 			this.addEventListenerForSubscription(job, 'done', job => publish({
 				event: 'done',
 				historyEntry: job.history[0],
