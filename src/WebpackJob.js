@@ -92,6 +92,7 @@ export default class WebpackJob extends EventEmitter {
 		}
 
 		this.isStarting = true;
+		this.cleanupJobData();
 
 		const args = [
 			path.resolve(__dirname, './tasks/build.js'),
@@ -187,7 +188,14 @@ export default class WebpackJob extends EventEmitter {
 				break;
 			}
 			case 'api-usage': {
-				this.tiSymbols = message.data;
+				for (const usageInfo of message.data) {
+					const { file, symbols = [], removed = false } = usageInfo;
+					if (removed) {
+						delete this.tiSymbols[file];
+					} else {
+						this.tiSymbols[file] = symbols;
+					}
+				}
 				this.emit('api-usage', this.tiSymbols);
 			}
 		}

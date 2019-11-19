@@ -1,41 +1,68 @@
 import path from 'path';
 
 import { apiTracker } from '../utils/api-tracker';
-import { isWindows, sendData, parseRequest } from '../../utils';
+import { isWindows, parseRequest } from '../../utils';
 
 export class ApiTrackerPlugin {
 	constructor(options) {
 		this.excludePattern = this.generateExcludePattern((options && options.exclude) || []);
 		this.tiNodeRegExp = /^Ti(tanium)?/;
 		this.cwd = options.cwd;
+		this.watchRun = false;
+		this.changedModules = [];
 	}
 
 	apply(compiler) {
-		compiler.hooks.normalModuleFactory.tap('ApiTracker:normalModuleFactory', factory => {
-			factory.hooks.parser.for('javascript/auto').tap('ApiTracker:parser', (parser, options) => {
-				const handler = expression => {
-					const { module: { userRequest } } = parser.state;
-					const requestInfo = parseRequest(userRequest, this.cwd);
-					const file = requestInfo.file;
-					if (this.excludePattern && this.excludePattern.test(file)) {
-						return;
-					}
-					const tiExpression = this.getTitaniumExpression(expression);
-					const fullFilePath = path.resolve(this.cwd, file);
-					const symbols = apiTracker.getSymbolSet(fullFilePath);
-					if (tiExpression && !symbols.has(tiExpression)) {
-						symbols.add(tiExpression);
-						parser.hooks.expressionAnyMember.for(tiExpression).tap('ApiTracker:expressionAnyMember', handler);
-						parser.hooks.expressionAnyMember.for(tiExpression.replace(/^Titanium/, 'Ti')).tap('ApiTracker:expressionAnyMember', handler);
-					}
-				};
-				parser.hooks.expressionAnyMember.for('Titanium').tap('ApiTracker:expressionAnyMember', handler);
-				parser.hooks.expressionAnyMember.for('Ti').tap('ApiTracker:expressionAnyMember', handler);
-			});
+		compiler.hooks.invalid.tap('ApiTracker', () => {
+			this.watchRun = true;
+			this.changedModules = [];
 		});
 
-		compiler.hooks.done.tap('ApiTracker:done', () => {
-			sendData('api-usage', apiTracker.toJson());
+		compiler.hooks.compilation.tap(
+			'ApiTracker',
+			(compilation, { normalModuleFactory }) => {
+				normalModuleFactory.hooks.parser.for('javascript/auto').tap('ApiTracker:parser', (parser, options) => {
+					const handler = expression => {
+						const { module: { userRequest } } = parser.state;
+						const filePath = this.resolvePath(userRequest);
+						const symbols = apiTracker.getSymbolSet(filePath);
+						if (this.excludePattern && this.excludePattern.test(filePath)) {
+							return;
+						}
+
+						const tiExpression = this.getTitaniumExpression(expression);
+						if (!tiExpression) {
+							return;
+						}
+						const shortExpression = tiExpression.substring(9); // Drop leading 'Titanium.'
+						if (!symbols.has(shortExpression)) {
+							symbols.add(shortExpression);
+							parser.hooks.expressionAnyMember
+								.for(tiExpression)
+								.tap('ApiTracker:expressionAnyMember', handler);
+							parser.hooks.expressionAnyMember
+								.for(tiExpression.replace(/^Titanium/, 'Ti'))
+								.tap('ApiTracker:expressionAnyMember', handler);
+						}
+					};
+					parser.hooks.expressionAnyMember
+						.for('Titanium')
+						.tap('ApiTracker:expressionAnyMember', handler);
+					parser.hooks.expressionAnyMember
+						.for('Ti')
+						.tap('ApiTracker:expressionAnyMember', handler);
+				});
+
+				if (this.watchRun) {
+					normalModuleFactory.hooks.module.tap('ApiTrack', module => {
+						this.changedModules.push(this.resolvePath(module.userRequest));
+					});
+				}
+			}
+		);
+
+		compiler.hooks.done.tap('ApiTracker', () => {
+			apiTracker.sendUsage(this.watchRun ? this.changedModules : undefined);
 		});
 	}
 
@@ -53,6 +80,12 @@ export class ApiTrackerPlugin {
 			}
 		});
 		return excludes.length ? new RegExp(excludes.join('|')) : null;
+	}
+
+	resolvePath(userRequest) {
+		const requestInfo = parseRequest(userRequest, this.cwd);
+		const file = requestInfo.file;
+		return path.resolve(this.cwd, file);
 	}
 
 	getTitaniumExpression(member) {

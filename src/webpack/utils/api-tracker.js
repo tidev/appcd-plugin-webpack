@@ -1,3 +1,5 @@
+import { sendData } from '../../utils/ipc';
+
 class ApiTracker {
 	constructor() {
 		this.tiSymbols = new Map();
@@ -13,12 +15,17 @@ class ApiTracker {
 		return symbols;
 	}
 
-	toJson() {
-		const data = {};
-		this.tiSymbols.forEach((symbolSet, fileName) => {
-			data[fileName] = [ ...symbolSet ];
+	sendUsage(fileList) {
+		const usage = [];
+		this.tiSymbols.forEach((symbols, file) => {
+			if (!fileList || fileList.includes(file)) {
+				usage.push({
+					file,
+					symbols: [ ...symbols ]
+				});
+			}
 		});
-		return data;
+		sendData('api-usage', usage);
 	}
 }
 

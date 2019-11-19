@@ -53,20 +53,20 @@ module.exports = async function titaniumLoader(content, sourceMap) {
 		if (component.template.lang === 'pug') {
 			// TODO: handle pug templates
 		}
+		const symbols = apiTracker.getSymbolSet(this.resourcePath);
 		compiler.compile(component.template.content, {
 			modules: [
 				{
 					postTransformNode: node => {
 						const tag = node.tag;
-						const symbols = apiTracker.getSymbolSet(this.resourcePath);
 						const possibleTagNames = [ hyphenate(tag), capitalize(camelize(tag)) ];
 						for (const tagName of possibleTagNames) {
 							if (elementRegistry.hasElement(tagName)) {
 								const metadata = elementRegistry.getViewMetadata(tagName);
 								const typeName = metadata.typeName;
 								const lastDotIndex = metadata.typeName.lastIndexOf('.');
-								const createFunctionSymbolName = typeName.slice(0, lastDotIndex) + 'create' + typeName.slice(lastDotIndex);
-								symbols.add(createFunctionSymbolName);
+								const createFunctionSymbolName = typeName.slice(0, lastDotIndex + 1) + 'create' + typeName.slice(lastDotIndex + 1);
+								symbols.add(createFunctionSymbolName.replace(/^Ti(tanium)?\./, ''));
 							}
 						}
 					}
