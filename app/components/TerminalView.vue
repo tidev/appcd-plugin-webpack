@@ -1,12 +1,11 @@
 <template>
-  <dashboard-card dark color="#0e1f25" class="terminal-card">
+  <dashboard-card v-resize="fit" dark color="#0e1f25" class="terminal-card">
     <v-card-title class="terminal-header">
       <v-icon left>mdi-console</v-icon> Output
     </v-card-title>
     <v-card-text class="d-flex terminal-view pt-3">
       <div ref="render" class="terminal-render"></div>
     </v-card-text>
-    <resize-observer @notify="fit" />
   </dashboard-card>
 </template>
 
@@ -104,8 +103,7 @@ export default {
 </script>
 
 <style lang="sass">
-@import "@/node_modules/xterm/css/xterm.css"
-
+@import "~xterm/css/xterm"
 
 .terminal-card
   position: relative
