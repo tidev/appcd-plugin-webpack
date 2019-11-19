@@ -10,6 +10,7 @@ const {
 	titaniumTarget,
 	TitaniumExternalsPlugins
 } = require('webpack-target-titanium');
+const TerserPlugin = require('terser-webpack-plugin');
 
 const { generateTranspileDepRegex } = require('../utils');
 const { ApiTrackerPlugin, StateNotifierPlugin } = require('../webpack');
@@ -175,5 +176,11 @@ module.exports = function (api, options) {
 		// plugins, e.g. friendly-errors
 		config.plugin('state-notifier')
 			.use(StateNotifierPlugin);
+
+		// optimization ------------------------------------------------------------
+
+		config.optimization
+			.minimizer('terser')
+				.use(TerserPlugin);
 	});
 };
