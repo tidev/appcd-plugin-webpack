@@ -140,16 +140,7 @@ module.exports = function (api, options) {
 		// plugins -----------------------------------------------------------------
 
 		config.plugin('clean')
-			.use(CleanWebpackPlugin, [
-				{
-					dry: false,
-					cleanOnceBeforeBuildPatterns: [
-						'**/*'
-					],
-					dangerouslyAllowCleanPatternsOutsideProject: true
-				}
-			]);
-		// TODO: replace with EnvironmentPlugin
+			.use(CleanWebpackPlugin);
 		config.plugin('define')
 			.use(webpack.DefinePlugin, [
 				{
