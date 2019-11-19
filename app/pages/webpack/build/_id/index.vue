@@ -5,7 +5,7 @@
         <v-breadcrumbs :items="breadcrumbItems" divider=">"></v-breadcrumbs>
         <div class="d-flex align-center grey--text build-info">
           <span class="px-2">|</span>
-          <type-label :type="job.type" />
+          <type-label :type="job.projectType" />
           <span class="px-2">|</span>
           <platform-label :platform="job.platform" />
         </div>
@@ -19,7 +19,7 @@
           @click="startJob()"
         >
           Start Build
-          <v-icon right>mdi-play</v-icon>
+          <v-icon right>$play</v-icon>
           <template v-slot:loader>
             Starting
             <span class="pl-2">
@@ -29,13 +29,14 @@
         </v-btn>
         <v-btn v-else color="primary" dark @click="stopJob()">
           Stop Build
-          <v-icon right>mdi-stop</v-icon>
+          <v-icon right>$stop</v-icon>
         </v-btn>
+        <BuildSettingsDialog />
       </v-col>
       <v-col cols="6" class="justify-end">
         <v-btn-toggle v-model="viewToggle" mandatory color="primary">
-          <v-btn><v-icon left>mdi-console</v-icon> Output</v-btn>
-          <v-btn><v-icon left>mdi-view-grid</v-icon> Dashboard</v-btn>
+          <v-btn><v-icon left>$console</v-icon> Output</v-btn>
+          <v-btn><v-icon left>$viewGrid</v-icon> Dashboard</v-btn>
         </v-btn-toggle>
       </v-col>
     </v-row>
@@ -77,11 +78,11 @@ import {
   AssetList,
   BuildHistory,
   BuildProgress,
+  BuildSettingsDialog,
   BuildStatus,
   DepsList
-} from '@/components'
+} from '@/components/webpack'
 import utilityMixin from '@/utils/mixin'
-import { SubscriptionClient } from '@/utils/subscription'
 
 export default {
   components: {
@@ -89,6 +90,7 @@ export default {
     AssetList,
     BuildHistory,
     BuildProgress,
+    BuildSettingsDialog,
     BuildStatus,
     DepsList,
     TerminalView: () => import('@/components/TerminalView')
@@ -113,7 +115,8 @@ export default {
       return [
         {
           text: 'Webpack',
-          to: '/'
+          to: '/webpack',
+          exact: true
         },
         {
           text: this.job.name,
@@ -121,9 +124,6 @@ export default {
         }
       ]
     }
-  },
-  asyncData({ params }) {
-    return { id: params.id }
   },
   async fetch({ error, params, store }) {
     try {
@@ -138,8 +138,7 @@ export default {
     }
   },
   async mounted() {
-    const client = new SubscriptionClient()
-    this.subscription = await client.subscribe(
+    this.subscription = await this.$subscribe(
       `/webpack/latest/status/${this.job.id}`
     )
     this.subscription.on('message', data => {
@@ -162,7 +161,9 @@ export default {
     async startJob() {
       try {
         this.isStarting = true
-        await this.$store.dispatch('webpack/startJob', this.job.id)
+        await this.$store.dispatch('webpack/startJob', {
+          identifier: this.job.id
+        })
         this.isStarting = false
       } catch (e) {
         this.isStarting = false
@@ -170,6 +171,7 @@ export default {
     },
     stopJob() {
       this.$store.dispatch('webpack/stopJob', this.job.id)
+      this.$store.commit('webpack/stats', null)
     }
   }
 }
@@ -180,16 +182,18 @@ export default {
   > .row
     > .col
       display: flex
-.header
-  flex: 0 0 auto
-  .v-btn-toggle
-    > .v-btn.v-size--default
-      height: 36px
-
-  .build-info
-    font-size: 14px
-.content
-  flex: auto 1 1
+.container
+  &.fill-height
+    .row
+      &.header
+        flex: 0 0 auto
+        .v-btn-toggle
+          > .v-btn.v-size--default
+            height: 36px
+        .build-info
+          font-size: 14px
+      &.content
+        flex: auto 1 1
 .info-block
   padding: 30px 12px
   text-align: center

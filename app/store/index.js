@@ -1,5 +1,9 @@
-import webpackUpdatePlugin from '@/utils/webpack-update'
+export const state = () => ({
+  connected: false
+})
 
-export const state = () => ({})
-
-export const plugins = [webpackUpdatePlugin]
+export const mutations = {
+  connected(state, isConnected) {
+    state.connected = isConnected
+  }
+}

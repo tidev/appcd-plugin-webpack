@@ -1,14 +1,13 @@
 import Vue from 'vue'
 
-function withBase(path) {
-  return `http://localhost:3000/webpack/latest/${path}`
-}
+import { base } from '@/utils/appcd'
+
+const withBase = base('webpack', '1.0.0')
 
 export const state = () => ({
   jobs: [],
-  currentJob: {},
-  stats: null,
-  connected: false
+  currentJob: null,
+  stats: null
 })
 
 export const getters = {
@@ -42,9 +41,6 @@ export const getters = {
 }
 
 export const mutations = {
-  connected(state, isConnected) {
-    state.connected = isConnected
-  },
   setJobs(state, jobs) {
     Vue.set(state, 'jobs', [...jobs])
   },
@@ -53,7 +49,7 @@ export const mutations = {
   },
   addOrUpdateJob(state, job) {
     const existingJobIndex = state.jobs.findIndex(j => j.id === job.id)
-    if (existingJobIndex) {
+    if (existingJobIndex !== -1) {
       const existingJob = state.jobs[existingJobIndex]
       const updatedJob = Object.assign({}, existingJob, job)
       Vue.set(state.jobs, existingJobIndex, updatedJob)
@@ -62,7 +58,7 @@ export const mutations = {
     }
   },
   setCurrentJob(state, job) {
-    Vue.set(state, 'currentJob', job)
+    state.currentJob = job
   },
   addHistory(state, historyEntry) {
     const history = state.currentJob.history
@@ -88,8 +84,8 @@ export const actions = {
     context.commit('setCurrentJob', data)
     context.commit('stats', stats)
   },
-  async startJob(context, id) {
-    await this.$axios.get(withBase(`start/${id}`))
+  async startJob(context, options) {
+    await this.$axios.post(withBase(`start`), { data: options })
     context.commit('updateJob', {
       progress: {
         progress: 0
@@ -99,7 +95,7 @@ export const actions = {
   async stopJob(context, id) {
     try {
       await this.$axios.get(withBase(`stop/${id}`))
-      context.commit('updateJob', { state: 'stopped' })
+      context.commit('updateJob', { state: 'stopped', tiSymbols: null })
     } catch (e) {
       context.commit('updateJob', { state: 'error' })
     }

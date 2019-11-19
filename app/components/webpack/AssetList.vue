@@ -49,16 +49,30 @@ export default {
       const ext = fileName.substr(fileName.lastIndexOf('.') + 1)
       switch (ext) {
         case 'js':
-          return 'mdi-language-javascript'
+          return '$javascript'
         case 'gif':
         case 'jpg':
         case 'jpeg':
         case 'png':
-          return 'mdi-image-outline'
+        case 'svg':
+          return '$image'
+        case 'mp3':
+        case 'wav':
+          return '$music'
+        case 'mp4':
+        case 'mpeg':
+        case 'mov':
+          return '$video'
         case 'otf':
-          return 'mdi-format-font'
+        case 'ttf':
+        case 'woff':
+          return '$font'
+        case 'xml':
+          return '$xml'
+        case 'db':
+          return '$database'
         default:
-          return 'mdi-file-question-outline'
+          return '$fileQuestion'
       }
     }
   }

@@ -2,7 +2,7 @@
   <v-container fill-height>
     <v-row justify="center">
       <v-col cols="6" xs="12">
-        <v-alert color="error" dark icon="mdi-alert" border="left" prominent>
+        <v-alert color="error" dark icon="alert" border="left" prominent>
           <h3 class="headline">Daemon is offline</h3>
           <div>
             The Daemon appears to be offline. Make sure it is started.

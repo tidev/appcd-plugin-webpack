@@ -8,7 +8,9 @@
 .v-card
   &.d-card
     box-shadow: 0 2px 4px 0 rgba(14, 30, 37, .12)
-    border-radius: 8px
+
+    &:not(.v-sheet--tile):not(.v-card--shaped)
+      border-radius: 8px
 
     ::-webkit-scrollbar
       width: 6px

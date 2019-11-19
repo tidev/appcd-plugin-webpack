@@ -1,6 +1,6 @@
 <template>
   <span class="d-flex align-center">
-    <v-icon color="#53b7e6" size="18" class="mr-1">mdi-webpack</v-icon>
+    <v-icon color="#53b7e6" size="18" class="mr-1">$webpack</v-icon>
     {{ title }}
   </span>
 </template>

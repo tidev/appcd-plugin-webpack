@@ -19,6 +19,7 @@ export default {
         case 'android':
           return 'Android'
         case 'ios':
+        case 'iphone':
           return 'iOS'
         default:
           return 'Unknown'
@@ -27,11 +28,12 @@ export default {
     icon() {
       switch (this.platform) {
         case 'android':
-          return 'mdi-android'
+          return '$android'
         case 'ios':
-          return 'mdi-apple'
+        case 'iphone':
+          return '$apple'
         default:
-          return 'mdi-cellphone'
+          return '$cellphone'
       }
     },
     iconColor() {
@@ -39,6 +41,7 @@ export default {
         case 'android':
           return '#78C257'
         case 'ios':
+        case 'iphone':
           return '#A3AAAE'
         default:
           return null

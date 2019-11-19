@@ -11,7 +11,7 @@ function decodeData(data) {
       return decode(rawData)
     }
   } catch (e) {
-    console.log(data)
+    return {}
   }
 }
 
@@ -38,7 +38,7 @@ class Subscription extends EventEmitter {
 /**
  * Appcelerator Daemon web client for subscriptions to services
  */
-export class SubscriptionClient extends EventEmitter {
+class SubscriptionClient extends EventEmitter {
   constructor() {
     super()
 
@@ -53,13 +53,16 @@ export class SubscriptionClient extends EventEmitter {
     this.socket = new WebSocket('ws://localhost:1732')
     this.socket.binaryType = 'arraybuffer'
     this.socket.addEventListener('open', () => {
+      this.connected = true
       this.emit('connect')
       this.sendQueue.forEach(send => send())
     })
     this.socket.addEventListener('close', () => {
-      this.emit('disconnect')
+      this.connected = false
+      this.emit('close')
     })
     this.socket.addEventListener('error', e => {
+      this.connected = false
       this.emit('error', e)
     })
     this.socket.addEventListener('message', event => {
@@ -122,3 +125,5 @@ export class SubscriptionClient extends EventEmitter {
     }
   }
 }
+
+export const client = new SubscriptionClient()

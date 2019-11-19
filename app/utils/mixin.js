@@ -3,27 +3,27 @@ export default {
     getIcon(job) {
       switch (job.state) {
         case 'ready':
-          return 'mdi-check'
+          return '$check'
         case 'building':
-          return 'mdi-webpack'
+          return '$flask'
         case 'started':
         case 'stopped':
-          return 'mdi-webpack'
+          return '$webpack'
         case 'error':
-          return 'mdi-alert'
+          return '$exclamation'
       }
     },
     getIconClass(job) {
       switch (job.state) {
         case 'ready':
-          return 'primary white--text'
+          return 'primary'
         case 'building':
-          return 'info white--text'
+          return 'warning'
         case 'started':
         case 'stopped':
-          return 'grey white--text'
+          return 'grey'
         case 'error':
-          return 'red white--text'
+          return 'error'
       }
     }
   }

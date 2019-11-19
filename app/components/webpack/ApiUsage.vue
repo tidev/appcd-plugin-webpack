@@ -6,7 +6,7 @@
       <v-tooltip left max-width="250">
         <template v-slot:activator="{ on }">
           <v-icon color="grey lighten-1" v-on="on">
-            mdi-information-outline
+            $information
           </v-icon>
         </template>
         <span>
@@ -22,10 +22,10 @@
         <v-treeview :items="apiTreeItems" dense hoverable open-on-click>
           <template v-slot:prepend="{ item, open }">
             <v-icon v-if="item.type === 'namespace'" color="primary">
-              mdi-cube-outline
+              $cube
             </v-icon>
             <v-icon v-else color="primary">
-              mdi-code-tags
+              $code
             </v-icon>
           </template>
         </v-treeview>

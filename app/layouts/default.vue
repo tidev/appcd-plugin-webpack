@@ -2,36 +2,19 @@
   <v-app>
     <v-app-bar fixed app clipped-left color="#0e1f25" dark>
       <v-toolbar-title>
-        <v-list-item dense>
-          <v-list-item-action>
-            <img :src="require('@/assets/axway-logo.png')" height="30" />
-          </v-list-item-action>
-          <v-list-item-content>
-            Appcd Dashboard
-          </v-list-item-content>
-        </v-list-item>
+        <nuxt-link to="/" class="d-flex title-link">
+          <img src="@/assets/axway-logo.png" height="30" class="pr-3" />
+          <span>Appcd Dashboard</span>
+        </nuxt-link>
       </v-toolbar-title>
       <v-spacer />
-      <v-toolbar-items class="hidden-sm-and-down">
-        <v-tooltip bottom>
-          <template v-slot:activator="{ on }">
-            <v-icon
-              class="mx-3"
-              size="16"
-              :class="[connectionStateClass]"
-              v-on="on"
-            >
-              mdi-checkbox-blank-circle
-            </v-icon>
-          </template>
-          <span>{{ connectionTooltip }}</span>
-        </v-tooltip>
+      <v-toolbar-items>
         <v-btn
           icon
           href="https://github.com/appcelerator/appc-daemon"
           target="_blank"
         >
-          <v-icon>mdi-github-circle</v-icon>
+          <v-icon>$github</v-icon>
         </v-btn>
       </v-toolbar-items>
     </v-app-bar>
@@ -54,7 +37,7 @@
             active-class="primary--text"
             nuxt
             link
-            to="/"
+            :to="item.link"
           >
             <v-list-item-action>
               <v-icon color="primary">{{ item.icon }}</v-icon>
@@ -68,6 +51,24 @@
         </template>
       </v-list>
     </v-navigation-drawer>
+
+    <v-slide-y-transition>
+      <v-system-bar
+        v-show="showConnectionAlert"
+        fixed
+        color="red"
+        dark
+        height="40"
+        class="connection-alert"
+      >
+        <v-row>
+          <v-col cols="12" class="text-center">
+            <v-icon class="mr-3">$cloudOff</v-icon>
+            <span>Disconnected from Appc Daemon!</span>
+          </v-col>
+        </v-row>
+      </v-system-bar>
+    </v-slide-y-transition>
 
     <v-content>
       <nuxt />
@@ -85,27 +86,41 @@ export default {
   data() {
     return {
       drawer: null,
-      items: [{ heading: 'Build' }, { text: 'Webpack', icon: 'mdi-webpack' }],
+      items: [
+        { heading: 'General' },
+        { text: 'System Info', icon: '$devices', link: '/titanium/info' },
+        { text: 'SDK', icon: '$titanium', link: '/titanium/sdk' },
+        { heading: 'Build' },
+        { text: 'Webpack', icon: '$webpack', link: '/webpack' }
+      ],
       title: 'appcd-webpack'
     }
   },
   computed: {
-    connectionStateClass() {
-      if (this.connected) {
-        return 'success--text'
-      } else {
-        return 'grey--text text--lighten-2'
-      }
+    showConnectionAlert() {
+      return !this.connected
     },
-    connectionTooltip() {
-      return this.connected ? 'Connected to Daemon' : 'Not connected to Daemon'
-    },
-    ...mapState('webpack', ['connected'])
+    ...mapState(['connected'])
   }
 }
 </script>
 
 <style lang="sass">
+@import '~vuetify/src/styles/styles.sass'
+
+.v-toolbar
+  .title-link
+    text-decoration: none
+    color: map-deep-get($material-theme, 'text', 'theme')
 .copyright
   font-size: 0.8rem
+
+.theme--dark
+  &.v-system-bar
+    &.connection-alert
+      z-index: 4
+      top: 64px
+      color: map-deep-get($material-dark, 'text', 'primary')
+      & .v-icon
+        color: map-deep-get($material-dark, 'text', 'primary')
 </style>

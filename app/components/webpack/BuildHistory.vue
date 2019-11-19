@@ -6,8 +6,8 @@
     <stats-loading v-if="!history.length" />
     <v-list v-else height="275">
       <v-list-item v-for="item in history" :key="item.id" three-line>
-        <v-list-item-avatar>
-          <v-icon :class="[getIconClass(item)]">
+        <v-list-item-avatar :class="[getIconClass(item)]">
+          <v-icon size="24" class="white--text">
             {{ getIcon(item) }}
           </v-icon>
         </v-list-item-avatar>

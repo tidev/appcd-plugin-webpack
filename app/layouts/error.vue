@@ -3,13 +3,14 @@
     <v-row justify="center">
       <v-col cols="6" xs="12">
         <dashboard-card>
-          <v-card-title>
-            {{ message }}
-          </v-card-title>
-          <v-card-text>
-            <NuxtLink to="/">
-              Home page
-            </NuxtLink>
+          <v-card-text class="text-center">
+            <v-icon size="64" color="grey lighten-2">
+              mdi-skull-crossbones
+            </v-icon>
+            <h2 class="py-6">{{ message }}</h2>
+            <v-btn color="primary" to="/">
+              Go home
+            </v-btn>
           </v-card-text>
         </dashboard-card>
       </v-col>

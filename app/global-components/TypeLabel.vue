@@ -16,6 +16,8 @@ export default {
   computed: {
     title() {
       switch (this.type) {
+        case 'alloy':
+          return 'Alloy'
         case 'angular':
           return 'Angular'
         case 'classic':
@@ -29,21 +31,23 @@ export default {
     icon() {
       switch (this.type) {
         case 'angular':
-          return 'mdi-angular'
+          return '$angular'
+        case 'alloy':
         case 'classic':
-          return 'mdi-language-javascript'
+          return '$titanium'
         case 'vue':
-          return 'mdi-vuejs'
+          return '$vuejs'
         default:
-          return 'mdi-language-javascript'
+          return '$javascript'
       }
     },
     iconColor() {
       switch (this.type) {
         case 'angular':
           return '#dc222f'
+        case 'alloy':
         case 'classic':
-          return '#ca2127'
+          return '#DB110F'
         case 'vue':
           return '#4fc08d'
         default:
