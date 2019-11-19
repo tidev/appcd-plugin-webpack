@@ -5,6 +5,7 @@
 	},
 	"rules": {
 		"node/no-unsupported-features/es-syntax": "off",
+		"nuxt/no-cjs-in-config": "off",
 		"require-atomic-updates": "off"
 	}
 }
