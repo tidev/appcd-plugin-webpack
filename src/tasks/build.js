@@ -10,14 +10,12 @@ const args = resolveArgs();
 const projectDir = args.project;
 const platform = args.platform;
 const watch = args.watch;
-const modules = args.modules;
 
 const hookManager = new HookManager();
 registerHooks(hookManager);
 
 const projectOptions = loadProjectOptions(projectDir, {
 	platform,
-	modules,
 	watch
 });
 const hooks = hookManager.getHookContextForProject(projectDir, projectOptions);

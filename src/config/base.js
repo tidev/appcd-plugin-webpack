@@ -149,7 +149,7 @@ module.exports = function (api, options) {
 			]);
 		config.plugin('titanium-externals')
 			.use(TitaniumExternalsPlugins, [
-				options.modules
+				[...new Set(options.tiapp.modules.map(m => m.id))]
 			]);
 		config.plugin('app.js')
 			.use(GenerateAppJsPlugin, [

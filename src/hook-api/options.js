@@ -7,17 +7,15 @@ const schema = joi.object({
 	platform: joi.string()
 		.valid('android', 'ios')
 		.required(),
-	modules: joi.array()
-		.items(
-			joi.string()
-		),
 	watch: joi.bool(),
 	transpileDependencies: joi.array()
 		.items(
 			joi.string(),
 			joi.object()
 				.instance(RegExp)
-		)
+		),
+	tiapp: joi.object()
+		.unknown()
 });
 
 export function validate(options) {
@@ -29,6 +27,5 @@ export function validate(options) {
 
 export const defaults = () => ({
 	watch: false,
-	modules: [],
 	transpileDependencies: []
 });

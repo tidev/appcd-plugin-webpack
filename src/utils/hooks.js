@@ -20,7 +20,8 @@ export function loadProjectOptions(projectDir, baseOptions) {
 	if (fs.existsSync(tiAppPath)) {
 		const tiapp = new tiappxml(tiAppPath);
 		options = {
-			...tiapp.webpack
+			...tiapp.webpack,
+			tiapp
 		};
 	}
 
