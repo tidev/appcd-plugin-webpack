@@ -1,5 +1,6 @@
 /* eslint indent: "off" */
 
+const babel = require('@babel/core');
 const FriendlyErrorsPlugin = require('@soda/friendly-errors-webpack-plugin');
 const path = require('path');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
@@ -12,13 +13,17 @@ const {
 } = require('webpack-target-titanium');
 const TerserPlugin = require('terser-webpack-plugin');
 
-const { generateTranspileDepRegex } = require('../utils');
+const { configureTitaniumAppPreset, generateTranspileDepRegex } = require('../utils');
 const { ApiTrackerPlugin, StateNotifierPlugin } = require('../webpack');
 
 module.exports = function (api, options) {
 	const projectDir = api.getCwd();
 	const outputDirectory = api.resolve('Resources');
 	const platformName = options.platform;
+	const babelConfig = babel.loadPartialConfig({
+		cwd: projectDir
+	});
+	configureTitaniumAppPreset(babelConfig, api, options);
 
 	const resolveLocal = (...args) => {
 		return path.resolve(__dirname, '..', '..', ...args);
@@ -92,21 +97,12 @@ module.exports = function (api, options) {
 						'babel.config.js'
 					]))
 					.end();
+					*/
 
 		jsRule
 			.use('babel-loader')
 				.loader('babel-loader')
-				// TODO: Add @babel/preset-env settings based on platform
-				.options({
-					cwd: path.join(projectDir, 'app'),
-					plugins: [
-						[ require.resolve('babel-plugin-transform-titanium'), {
-							deploytype: 'development',
-							platform: options.platform,
-							target: 'simulator'
-						} ]
-					]
-				});
+				.options(babelConfig.options);
 
 		// static assets -----------------------------------------------------------
 

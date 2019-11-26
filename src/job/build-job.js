@@ -114,12 +114,10 @@ export default class BuildJob extends EventEmitter {
 		const args = [
 			path.resolve(__dirname, '..', 'tasks', `${taskName}.js`),
 			'--project', this.projectPath,
-			'--platform', this.platform
+			'--platform', this.platform,
+			'--target', this.options.buildTarget,
+			'--sdk', this.options.sdkPath,
 		];
-
-		for (const moduleName of this.options.modules) {
-			args.push('-m', moduleName);
-		}
 
 		let watch = this.deployType !== 'production';
 		if (typeof this.options.watch !== 'undefined') {

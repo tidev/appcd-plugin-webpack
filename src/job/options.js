@@ -11,10 +11,10 @@ const schema = joi.object({
 	platform: joi.string()
 		.valid('android', 'ios')
 		.required(),
-	modules: joi.array()
-		.items(
-			joi.string()
-		),
+	buildTarget: joi.string()
+		.required(),
+	sdkPath: joi.string()
+		.required(),
 	watch: joi.bool()
 }).unknown();
 

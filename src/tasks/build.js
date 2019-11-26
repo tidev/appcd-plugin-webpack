@@ -9,6 +9,8 @@ const args = resolveArgs();
 
 const projectDir = args.project;
 const platform = args.platform;
+const buildTarget = args.target;
+const sdkPath = args.sdk;
 const watch = args.watch;
 
 const hookManager = new HookManager();
@@ -16,6 +18,8 @@ registerHooks(hookManager);
 
 const projectOptions = loadProjectOptions(projectDir, {
 	platform,
+	buildTarget,
+	sdkPath,
 	watch
 });
 const hooks = hookManager.getHookContextForProject(projectDir, projectOptions);

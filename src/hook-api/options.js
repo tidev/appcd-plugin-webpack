@@ -7,6 +7,10 @@ const schema = joi.object({
 	platform: joi.string()
 		.valid('android', 'ios')
 		.required(),
+	buildTarget: joi.string()
+		.required(),
+	sdkPath: joi.string()
+		.required(),
 	watch: joi.bool(),
 	transpileDependencies: joi.array()
 		.items(
