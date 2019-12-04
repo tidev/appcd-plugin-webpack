@@ -16,6 +16,10 @@ export const state = () => ({
 
 export const getters = {
   updateAvailable: state => {
+    if (state.latestRelease === null) {
+      return false
+    }
+
     const installedIndex = state.installed.findIndex(
       sdkInfo => sdkInfo.name === state.latestRelease
     )
@@ -50,13 +54,18 @@ export const actions = {
     context.commit('setInstalled', data.reverse())
   },
   async fetchReleases(context) {
-    const { data } = await this.$axios.get(withBase('sdk/releases'))
-    const latest = data.latest
-    delete data.latest
-    const releases = normalizeReleases(data)
-    releases.sort((a, b) => b.name.localeCompare(a.name))
-    context.commit('setReleases', releases)
-    context.commit('setLatestRelease', latest.name)
+    try {
+      const { data } = await this.$axios.get(withBase('sdk/releases'))
+      const latest = data.latest
+      delete data.latest
+      const releases = normalizeReleases(data)
+      releases.sort((a, b) => b.name.localeCompare(a.name))
+      context.commit('setReleases', releases)
+      context.commit('setLatestRelease', latest.name)
+    } catch (e) {
+      context.commit('setReleases', [])
+      context.commit('setLatestRelease', null)
+    }
   },
   async install(context, options) {
     const { sdkVersion, overwrite } = options
