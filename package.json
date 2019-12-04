@@ -85,7 +85,7 @@
     "xterm-addon-web-links": "^0.2.1"
   },
   "appcd": {
-    "appcdVersion": "3.x",
+    "appcdVersion": "^3.1.0",
     "inactivityTimeout": 600000,
     "name": "webpack",
     "type": "external"
