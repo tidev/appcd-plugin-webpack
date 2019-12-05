@@ -53,10 +53,17 @@ export default class HookApi {
 	 * @return {string} resolved module path
 	 */
 	resolvePeer(request) {
-		const modulePath = require.resolve(request, {
-			paths: [ this.getCwd() ]
-		});
-		return modulePath;
+		try {
+			const modulePath = require.resolve(request, {
+				paths: [ this.getCwd() ]
+			});
+			return modulePath;
+		} catch (e) {
+			if (e.code === 'MODULE_NOT_FOUND') {
+				e.message += ` as a peer dependency in ${this.getCwd()}`;
+			}
+			throw e;
+		}
 	}
 
 	/**
