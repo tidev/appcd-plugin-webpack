@@ -22,7 +22,7 @@ const projectOptions = loadProjectOptions(projectDir, {
 	sdkPath,
 	watch
 });
-const hooks = hookManager.getHookContextForProject(projectDir, projectOptions);
+const hooks = hookManager.createProjectHookContext(projectDir, projectOptions);
 
 const config = new Config();
 hooks.applyHook('chainWebpack', config);

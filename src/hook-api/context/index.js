@@ -1,4 +1,5 @@
 import HookApi from '../index';
+import { EventEmitter } from 'events';
 
 /**
  * The base context for hooks.
@@ -6,11 +7,13 @@ import HookApi from '../index';
  * A hook context serves as a grouping container for a set of hooks. It manages
  * adding and removing of hooks as well as applying each individual hook.
  */
-export default class HookContext {
+export default class HookContext extends EventEmitter {
 	/**
 	 * Constructs a new hook context.
 	 */
 	constructor() {
+		super();
+
 		this.hooks = new Map();
 		this.options = {};
 	}
@@ -47,7 +50,16 @@ export default class HookContext {
 	}
 
 	/**
-	 * Applies the function exportet from a hook file.
+	 * Initializes a context.
+	 *
+	 * Typically used by the context to load all known hook files.
+	 */
+	initialize() {
+
+	}
+
+	/**
+	 * Applies the function exported from a hook file.
 	 *
 	 * @param {string} id Hook file identifier.
 	 * @param {Function} apply Apply function exportet by the hook file.
@@ -66,10 +78,18 @@ export default class HookContext {
 	 * @param {Function} apply Apply function exportet by the hook file.
 	 */
 	reapplyHookFile(id, apply) {
+		this.removeHookFile(id, false);
+		this.applyHookFile(id, apply);
+		this.emit('change', { id, type: 'change' });
+	}
+
+	removeHookFile(id, shouldEmit = true) {
 		this.hooks.forEach(hook => {
 			hook.remove(id);
 		});
-		this.applyHookFile(id, apply);
+		if (shouldEmit) {
+			this.emit('change', { id, type: 'remove' });
+		}
 	}
 
 	/**

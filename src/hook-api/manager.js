@@ -45,16 +45,12 @@ export default class HookManager {
 		].map(idToHook);
 	}
 
-	getHookContextForProject(projectDir, options) {
+	getHookContextForProject(projectDir) {
 		if (this.hookContexts.has(projectDir)) {
 			return this.hookContexts.get(projectDir);
 		}
 
-		const context = this.createProjectHookContext(projectDir, options);
-		this.builtInHookAppliers.map(({ id, apply }) => context.applyHookFile(id, apply));
-		context.initialize();
-
-		return context;
+		throw new Error(`No project hook context available for "${projectDir}". Create one with "createProjectHookContext".`);
 	}
 
 	createProjectHookContext(projectDir, options) {
@@ -64,6 +60,9 @@ export default class HookManager {
 			const hook = new hookClass(name);
 			context.addHook(name, hook);
 		});
+		this.builtInHookAppliers.map(({ id, apply }) => context.applyHookFile(id, apply));
+		context.initialize();
+
 		return context;
 	}
 }

@@ -3,7 +3,8 @@ import path from 'path';
 import defaultsDeep from 'lodash.defaultsdeep';
 
 import { validate, defaults } from './options';
-import { processStats } from '../utils/stats';
+import HookManager from '../hook-api/manager';
+import { loadProjectOptions, processStats, registerHooks } from '../utils';
 
 const defaultJsonFields = [
 	'id',
@@ -30,7 +31,7 @@ const jsonTemplateConfig = {
 /**
  * Representation of a Webpack build job.
  *
- * Uses webpack's Node api to run a webpack compilation
+ * Uses webpack's NodeJS api to run a webpack compilation
  */
 export default class BuildJob extends EventEmitter {
 	constructor(id, options) {
@@ -48,10 +49,19 @@ export default class BuildJob extends EventEmitter {
 		this.tiSymbols = {};
 
 		this.setOptions(options);
-	}
 
-	static get STATE_STARTED() {
-		return 'started';
+		const hookManager = new HookManager();
+		registerHooks(hookManager);
+		const projectOptions = loadProjectOptions(this.projectPath, {
+			platform: this.platform,
+			buildTarget: this.options.buildTarget,
+			sdkPath: this.options.sdkPath,
+			watch: true
+		});
+		this.hooks = hookManager.createProjectHookContext(this.projectPath, projectOptions);
+		this.hooks.on('change', () => {
+			this.restart();
+		});
 	}
 
 	static get STATE_BUILDING() {
@@ -147,7 +157,7 @@ export default class BuildJob extends EventEmitter {
 				case 'spawn': {
 					clearTimeout(startTimeout);
 					this.pid = data.pid;
-					this.state = BuildJob.STATE_STARTED;
+					this.state = BuildJob.STATE_BUILDING;
 					this.isStarting = false;
 					return Promise.resolve();
 				}
@@ -166,7 +176,8 @@ export default class BuildJob extends EventEmitter {
 					break;
 				}
 				case 'exit': {
-					if (data.code && data.code !== 0) {
+					this.pid = null;
+					if (data.code !== null && data.code !== 0) {
 						this.state = BuildJob.STATE_ERROR;
 					} else {
 						this.state = BuildJob.STATE_STOPPED;
@@ -176,15 +187,48 @@ export default class BuildJob extends EventEmitter {
 		});
 	}
 
+	/**
+	 * Stops the Webpack build task.
+	 *
+	 * Note that we don't set the state here as it will be set when the child
+	 * process' `exit` event is received. This will trigger a state change here
+	 * which we use to resolve the returned promise.
+	 */
 	async stop() {
 		if (typeof this.pid !== 'number') {
 			return;
 		}
 
-		await appcd.call(`/appcd/subprocess/kill/${this.pid}`);
-		this.pid = null;
-		this.state = BuildJob.STATE_STOPPED;
-		this.cleanupJobData();
+		return new Promise((resolve, reject) => {
+			const killTimeout = setTimeout(() => {
+				this.off('state', handler);
+				reject(new Error('Kill timeout of 5sec exceeded.'));
+			}, 5000);
+			const handler = (job, state) => {
+				if (state === BuildJob.STATE_STOPPED) {
+					this.off('state', handler);
+					clearTimeout(killTimeout);
+					this.pid = null;
+					this.cleanupJobData();
+					resolve();
+				}
+			};
+			this.on('state', handler);
+
+			appcd.call(`/appcd/subprocess/kill/${this.pid}`);
+		});
+	}
+
+	/**
+	 * Restarts the Webpack build task, but only if it was prevously running.
+	 */
+	async restart() {
+		if (this.pid === null) {
+			return;
+		}
+
+		await this.stop();
+		return this.start();
 	}
 
 	processIpcMessage(message) {
