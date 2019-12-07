@@ -24,6 +24,6 @@ export async function activate(config) {
 }
 
 export async function deactivate() {
-	jobManager.stopAll();
+	await jobManager.stopAll();
 	uiService.deactivate();
 }

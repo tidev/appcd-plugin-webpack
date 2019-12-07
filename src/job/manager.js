@@ -25,6 +25,6 @@ export default class JobManager extends EventEmitter {
 	}
 
 	async stopAll() {
-		return Promise.all(Array.from(this.jobs.values).map(async job => job.stop()));
+		return Promise.all(Array.from(this.jobs.values()).map(async job => job.stop()));
 	}
 }
