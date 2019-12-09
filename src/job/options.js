@@ -3,6 +3,8 @@ import joi from '@hapi/joi';
 const schema = joi.object({
 	identifier: joi.string()
 		.required(),
+	projectPath: joi.string()
+		.required(),
 	projectType: joi.string()
 		.valid('alloy', 'angular', 'classic', 'vue')
 		.required(),

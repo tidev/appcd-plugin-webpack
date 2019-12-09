@@ -34,11 +34,7 @@ module.exports = function (api, options) {
 			.context(path.join(projectDir, 'app'))
 			.target(titaniumTarget)
 			.mode('development')
-			/*
-			.entry('ti.main')
-				.add('/Users/jvennemann/Library/Application Support/Titanium/mobilesdk/osx/8.2.0/common/Resources/ti.main.js')
-				.end()
-			*/
+			.devtool(false)
 			.output
 				.path(outputDirectory)
 				.filename('[name].js')
@@ -145,7 +141,7 @@ module.exports = function (api, options) {
 			]);
 		config.plugin('titanium-externals')
 			.use(TitaniumExternalsPlugins, [
-				[...new Set(options.tiapp.modules.map(m => m.id))]
+				[ ...new Set(options.tiapp.modules.map(m => m.id)) ]
 			]);
 		config.plugin('app.js')
 			.use(GenerateAppJsPlugin, [
@@ -163,6 +159,22 @@ module.exports = function (api, options) {
 		// plugins, e.g. friendly-errors
 		config.plugin('state-notifier')
 			.use(StateNotifierPlugin);
+
+		if (process.env.NODE_ENV !== 'production') {
+			config.plugin('devtool')
+				.use(webpack.SourceMapDevToolPlugin, [
+					{
+						filename: null,
+						// NOTE: We MUST append a \n or else iOS will break, because it
+						// injects a ';' after the original file contents when doing it's
+						// require() impl
+						append: '\n//# sourceMappingURL=[url]\n',
+						module: true,
+						columns: false,
+						noSources: false
+					}
+				]);
+		}
 
 		// optimization ------------------------------------------------------------
 

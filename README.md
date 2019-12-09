@@ -6,9 +6,17 @@ Appcd plugin to manage Webpack build tasks.
 
 This plugin registers the following endpoints:
 
-### `/start`
+### `/start/:identifier?`
 
 Start a new Webpack build task.
+
+The `identifier` path parameter is optional. It is usefull if you want to start an existing Webpack build without changing its options.
+
+#### Parameters
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifier` | `string` |  (Optional) Identifier of an existing Webpack build task to start. |
 
 #### Payload
 
@@ -16,8 +24,12 @@ Start a new Webpack build task.
 | --- | --- | --- |
 | `identifier` | `string` |  A unique identifier for the Webpack build task. |
 | `projectPath` | `string` | Full path to the Titanium project. |
-| `type` | `string` |  Project type to load the appropriate config. Must be one of `angular`, `classic` or `vue` |
-| `platform` | `string` |  The platform target for the build task. Must be either `android` or`ios` |
+| `projectType` | `string` |  Project type to load the appropriate config. Must be one of `classic`, `alloy`, `angular` or `vue`. |
+| `deployType`| `string` | Current deploy type. Must be one of `development`, `test` or `production`. |
+| `platform` | `string` |  The platform target for the build task. Must be either `android` or`ios`. |
+| `buildTarget`| `string` | The current build target. |
+| `sdkPath`| `string` | Full path to the SDK that is used to build with. |
+| `watch`| `boolean` | Whether to to start Webpack in watch mode or not, `false` by default. |
 
 ### `/stop/:identifier`
 
@@ -29,7 +41,7 @@ Stop a running Webpack build task.
 | --- | --- | --- |
 | `identifier` | `string` |  Unique identifier of the Webpack build task to stop. |
 
-### `/status/:identifier`
+### `/status/:identifier?`
 
 Query the status of a webpack build task.
 
@@ -39,15 +51,24 @@ Query the status of a webpack build task.
 | --- | --- | --- |
 | `identifier` | `string` |  Unique identifier of the Webpack build task to query status for. |
 
-This endpoint supports subscriptions to get real-time updates about Webpack build status.
+> 💡 This endpoint supports subscriptions to get real-time updates for the Webpack build.
 
-### `/progress/:identifier`
+For subscription calls to this endpoint the `identifier` parameter is optional. If omitted, it will only publish following two events:
 
-Subscription endpoint for real-time progress updates of Webpack build tasks.
+- `added`: Published when a new Webpack build was added. The event data contains basic job info.
+- `state`: Published when the state of any Webpack build changes. The event data contains basic job info.
 
-| Name | Type | Description |
-| --- | --- | --- |
-| `identifier` | `string` |  Unique identifier of the Webpack build task to receive progress updates for. |
+#### Events
+
+When you subscribe to this entpoint for a specific Webpack build, you will be notified about build status changes and progress info via the following events:
+
+| Name | Description |
+| --- | --- |
+| `state` | Published when the state of a Webpack build changes. |
+| `progress` | Progress update for the current Webpack compilation. |
+| `output` | Any output emitted by the Webpack build will be streamed via this event. |
+| `api-usage` | Published whenever the usage of Titanium APIs changes. |
+| `done` | Published when the current Webpack compilation finished. Includes pre-processed Webpack stats data. |
 
 ### `/web`
 
