@@ -76,6 +76,24 @@ Serves a Web UI to manage Webpack build tasks.
 
 ![Web UI](/.github/web-ui.png "Web UI")
 
+## Development
+
+Since almost all related modules are currently still under development as well, setting up the development enviornment for the Webpack plugin currently requires to clone a couple of additional repos.
+
+1. Clone this repo along with all other required repos into the same root directory:
+
+    ```bash
+    git clone https://github.com/appcelerator/appcd-plugin-webpack.git
+    git clone https://github.com/appcelerator/alloy-devkit.git
+    git clone https://github.com/appcelerator/alloy-loader.git
+    ```
+
+1. Change into `appcd-plugin-webpack`
+    - Install dependencies with `yarn`.
+    - Link with `npm` so appcd can find the plugin: `npm link`. This needs to be done with NPM since appcd only searches the global NPM modules folder for available plugins (and not the one from Yarn).
+1. To start developing and recompile the plugin on changes run `yarn dev`
+1. (Optional) Start the Web UI with `yarn app:dev`.
+
 ## Legal
 
 This project is open source under the [Apache Public License v2][1] and is developed by
