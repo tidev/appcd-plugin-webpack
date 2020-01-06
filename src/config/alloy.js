@@ -2,7 +2,14 @@
 
 const CopyPlugin = require('copy-webpack-plugin');
 const path = require('path');
-const { DefinePlugin, ExternalsPlugin, WatchIgnorePlugin } = require('webpack');
+const {
+	DefinePlugin,
+	ExternalsPlugin,
+	NormalModuleReplacementPlugin,
+	WatchIgnorePlugin
+} = require('webpack');
+
+const { BootstrapPlugin } = require('../webpack/');
 
 module.exports = function (api, options) {
 	const projectDir = api.getCwd();
@@ -20,14 +27,14 @@ module.exports = function (api, options) {
 
 	api.chainWebpack(config => {
 		// entry -------------------------------------------------------------------
+
 		config
 			.entry('main')
 				.add('./alloy.js')
 				.end();
 
-		config.devtool('inline-source-map');
-
 		// resolve -----------------------------------------------------------------
+
 		config.resolve
 			.alias
 				.set('@', api.resolve('app', 'lib'))
@@ -128,13 +135,30 @@ module.exports = function (api, options) {
 					/alloy[/\\]CFG.js/
 				]
 			]);
-		config.plugin('define-alloy-version')
+		config.plugin('alloy-defines')
 			.use(DefinePlugin, [
 				{
 					ALLOY_VERSION: api.requirePeer('alloy/package.json').version,
 					// mobile web is dead, Alloy just still doesn't know it yet.
 					OS_MOBILEWEB: false
 				}
+			]);
+		config.plugin('widget-alias')
+			.use(NormalModuleReplacementPlugin, [
+				/@widget/,
+				resource => {
+					const widgetDirMatch = resource.context.match(/.*widgets[/\\][^/\\]+[/\\]/);
+					if (!widgetDirMatch) {
+						return;
+					}
+					const widgetDir = widgetDirMatch[0];
+					resource.request = `${widgetDir}${resource.request.replace('@widget/', 'lib/')}`;
+				}
+			]);
+		config.plugin('bootstrap-js')
+			.use(BootstrapPlugin, [
+				path.join(api.getCwd(), 'app'),
+				'lib'
 			]);
 	});
 };
