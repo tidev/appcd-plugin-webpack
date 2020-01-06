@@ -93,7 +93,6 @@ module.exports = function (api, options) {
 						'babel.config.js'
 					]))
 					.end();
-					*/
 
 		jsRule
 			.use('babel-loader')
