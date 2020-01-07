@@ -9,6 +9,8 @@ const schema = joi.object({
 		.required(),
 	buildTarget: joi.string()
 		.required(),
+	deployType: joi.string()
+		.required(),
 	sdkPath: joi.string()
 		.required(),
 	watch: joi.bool(),

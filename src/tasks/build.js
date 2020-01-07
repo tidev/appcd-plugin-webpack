@@ -5,13 +5,14 @@ import HookManager from '../hook-api/manager';
 import { DashboardPlugin } from '../webpack';
 import { loadProjectOptions, registerHooks, resolveArgs } from '../utils';
 
-const args = resolveArgs();
-
-const projectDir = args.project;
-const platform = args.platform;
-const buildTarget = args.target;
-const sdkPath = args.sdk;
-const watch = args.watch;
+const {
+	project: projectDir,
+	platform,
+	target: buildTarget,
+	deployType,
+	sdk: sdkPath,
+	watch
+} = resolveArgs();
 
 const hookManager = new HookManager();
 registerHooks(hookManager);
@@ -19,6 +20,7 @@ registerHooks(hookManager);
 const projectOptions = loadProjectOptions(projectDir, {
 	platform,
 	buildTarget,
+	deployType,
 	sdkPath,
 	watch
 });
@@ -28,7 +30,7 @@ const config = new Config();
 hooks.applyHook('chainWebpack', config);
 const webpackConfig = config.toConfig();
 
-if (args.watch) {
+if (watch) {
 	webpackConfig.watch = true;
 }
 
@@ -40,7 +42,7 @@ webpack(webpackConfig, (err, stats) => {
 		process.exit(1);
 	}
 
-	if (stats.hasErrors() && !args.watch) {
+	if (stats.hasErrors() && !watch) {
 		process.exit(1);
 	}
 });

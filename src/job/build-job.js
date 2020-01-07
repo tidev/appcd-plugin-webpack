@@ -55,6 +55,7 @@ export default class BuildJob extends EventEmitter {
 		const projectOptions = loadProjectOptions(this.projectPath, {
 			platform: this.platform,
 			buildTarget: this.options.buildTarget,
+			deployType: this.deployType,
 			sdkPath: this.options.sdkPath,
 			watch: true
 		});
@@ -126,6 +127,7 @@ export default class BuildJob extends EventEmitter {
 			'--project', this.projectPath,
 			'--platform', this.platform,
 			'--target', this.options.buildTarget,
+			'--deployType', this.deployType,
 			'--sdk', this.options.sdkPath,
 		];
 

@@ -17,7 +17,7 @@ module.exports = function (api, options) {
 	const { createCompileConfig, createCompiler } = api.requirePeer('alloy-compiler');
 	const alloyConfig = {
 		platform: options.platform,
-		deployType: options.deployType
+		deploytype: options.deployType
 	};
 	const compileConfig = createCompileConfig({ projectDir, alloyConfig });
 	const alloyCompiler = createCompiler({ compileConfig, webpack: true });
