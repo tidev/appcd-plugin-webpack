@@ -60,7 +60,8 @@
     "vue-loader": "^15.7.2",
     "webpack": "^4.39.3",
     "webpack-chain": "^6.0.0",
-    "webpack-target-titanium": "^1.0.0"
+    "webpack-target-titanium": "^1.0.0",
+    "webpack-virtual-modules": "^0.2.1"
   },
   "devDependencies": {
     "@mdi/js": "^4.5.95",

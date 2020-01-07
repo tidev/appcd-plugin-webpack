@@ -14,7 +14,7 @@ const {
 const TerserPlugin = require('terser-webpack-plugin');
 
 const { configureTitaniumAppPreset, generateTranspileDepRegex } = require('../utils');
-const { ApiTrackerPlugin, StateNotifierPlugin } = require('../webpack');
+const { ApiTrackerPlugin, BootstrapPlugin, StateNotifierPlugin } = require('../webpack');
 
 module.exports = function (api, options) {
 	const projectDir = api.getCwd();
@@ -154,10 +154,15 @@ module.exports = function (api, options) {
 			]);
 		config.plugin('friendly-errors')
 			.use(FriendlyErrorsPlugin);
-		// state notifier needs to come last to capture all output from previous
-		// plugins, e.g. friendly-errors
+		// state notifier needs to be placed after all other plugins that add
+		// output in webpack's `done` hook. e.g. friendly-errors
 		config.plugin('state-notifier')
 			.use(StateNotifierPlugin);
+		config.plugin('bootstrap-files')
+			.use(BootstrapPlugin, [
+				path.join(api.getCwd(), 'app'),
+				'src'
+			]);
 
 		if (process.env.NODE_ENV !== 'production') {
 			config.plugin('devtool')
