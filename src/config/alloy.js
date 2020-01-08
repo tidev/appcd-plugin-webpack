@@ -9,8 +9,6 @@ const {
 	WatchIgnorePlugin
 } = require('webpack');
 
-const { BootstrapPlugin } = require('../webpack/');
-
 module.exports = function (api, options) {
 	const projectDir = api.getCwd();
 	const alloyRoot = path.dirname(api.resolvePeer('alloy'));
@@ -155,10 +153,10 @@ module.exports = function (api, options) {
 					resource.request = `${widgetDir}${resource.request.replace('@widget/', 'lib/')}`;
 				}
 			]);
-		config.plugin('bootstrap-js')
-			.use(BootstrapPlugin, [
-				path.join(api.getCwd(), 'app'),
-				'lib'
-			]);
+		config.plugin('bootstrap-files')
+			.tap(args => {
+				args[1] = 'lib';
+				return args;
+			});
 	});
 };
