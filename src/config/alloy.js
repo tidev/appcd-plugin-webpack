@@ -61,6 +61,19 @@ module.exports = function (api, options) {
 					.options({
 						compiler: alloyCompiler,
 						platform: options.platform
+					})
+					.end()
+				.use('cache-loader')
+					.tap(() => {
+						return api.generateCacheConfig('compile-cache', {
+							'@babel/core': require('@babel/core/package.json').version,
+							'babel-loader': require('babel-loader/package.json').version,
+							alloy: api.requirePeer('alloy/package.json').version,
+							'alloy-compiler': api.requirePeer('alloy-compiler/package.json').version
+						}, [
+							'babel.config.js',
+							'app/config.json'
+						]);
 					});
 
 		config.module
