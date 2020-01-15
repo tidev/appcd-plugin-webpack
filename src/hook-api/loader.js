@@ -76,10 +76,21 @@ export function loadModule(request, context, force = false) {
 			clearRequireCache(resolvedPath);
 		}
 
-		return require(resolvedPath);
+		return interopRequireDefault(require(resolvedPath));
 	}
 
 	throw new Error(`Could not load hook ${request}`);
+}
+
+/**
+ * Returns the `default` export if the given object is a Babel transpiled
+ * ES6 module, otherwise just returns the object.
+ *
+ * @param {Object} obj Module export
+ * @return {Object} The default export
+ */
+export function interopRequireDefault(obj) {
+	return obj && obj.__esModule ? obj.default : obj;
 }
 
 /**

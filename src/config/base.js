@@ -19,7 +19,7 @@ const { ApiTrackerPlugin, BootstrapPlugin, StateNotifierPlugin } = require('../w
 module.exports = function (api, options) {
 	const projectDir = api.getCwd();
 	const outputDirectory = api.resolve('Resources');
-	const platformName = options.platform;
+	const platformName = options.build.platform;
 	const babelConfig = babel.loadPartialConfig({
 		cwd: projectDir
 	});
@@ -140,7 +140,7 @@ module.exports = function (api, options) {
 			]);
 		config.plugin('titanium-externals')
 			.use(TitaniumExternalsPlugins, [
-				[ ...new Set(options.tiapp.modules.map(m => m.id)) ]
+				[ ...new Set(options.project.tiapp.modules.map(m => m.id)) ]
 			]);
 		config.plugin('app.js')
 			.use(GenerateAppJsPlugin, [
@@ -154,10 +154,6 @@ module.exports = function (api, options) {
 			]);
 		config.plugin('friendly-errors')
 			.use(FriendlyErrorsPlugin);
-		// state notifier needs to be placed after all other plugins that add
-		// output in webpack's `done` hook. e.g. friendly-errors
-		config.plugin('state-notifier')
-			.use(StateNotifierPlugin);
 		config.plugin('bootstrap-files')
 			.use(BootstrapPlugin, [
 				path.join(api.getCwd(), 'app'),

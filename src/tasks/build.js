@@ -1,48 +1,33 @@
 import webpack from 'webpack';
-import Config from 'webpack-chain';
 
-import HookManager from '../hook-api/manager';
-import { DashboardPlugin } from '../webpack';
-import { loadProjectOptions, registerHooks, resolveArgs } from '../utils';
+import { DashboardPlugin, StateNotifierPlugin } from '../webpack';
 
-const {
-	project: projectDir,
-	platform,
-	target: buildTarget,
-	deployType,
-	sdk: sdkPath,
-	watch
-} = resolveArgs();
+export default (api, options) => {
+	api.registerTask('build', {
+		description: 'build for production'
+	}, async () => {
+		const { watch } = options;
 
-const hookManager = new HookManager();
-registerHooks(hookManager);
+		const config = api.resolveWebpackConfig();
+		if (watch) {
+			config.watch = true;
+		}
 
-const projectOptions = loadProjectOptions(projectDir, {
-	platform,
-	buildTarget,
-	deployType,
-	sdkPath,
-	watch
-});
-const hooks = hookManager.createProjectHookContext(projectDir, projectOptions);
+		config.plugins.push(new StateNotifierPlugin());
+		config.plugins.push(new DashboardPlugin(api.getCwd()));
 
-const config = new Config();
-hooks.applyHook('chainWebpack', config);
-const webpackConfig = config.toConfig();
+		return new Promise((resolve, reject) => {
+			webpack(config, (err, stats) => {
+				if (err) {
+					return reject(err);
+				}
 
-if (watch) {
-	webpackConfig.watch = true;
-}
+				if (stats.hasErrors()) {
+					return reject('Build failed with errors.');
+				}
 
-webpackConfig.plugins.push(new DashboardPlugin(projectDir));
-
-webpack(webpackConfig, (err, stats) => {
-	if (err) {
-		console.log(err);
-		process.exit(1);
-	}
-
-	if (stats.hasErrors() && !watch) {
-		process.exit(1);
-	}
-});
+				resolve();
+			});
+		});
+	});
+};

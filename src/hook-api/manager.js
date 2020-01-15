@@ -1,7 +1,8 @@
 import ProjectHookContext from './context/project';
 import Hook from './hook';
+import { interopRequireDefault } from './loader';
 
-export default class HookManager {
+class HookManager {
 	constructor() {
 		this.builtInHookAppliers = [];
 		this.hookClasses = new Map();
@@ -19,7 +20,7 @@ export default class HookManager {
 		});
 	}
 
-	deregisterHook(name) {
+	unregisterHook(name) {
 		this.hookClasses.delete(name);
 
 		this.hookContexts.forEach(context => {
@@ -34,26 +35,20 @@ export default class HookManager {
 	 * use a simple require to load the apply function.
 	 */
 	resolveBuiltInHooks() {
-		// TODO: This needs to happen per-plugin when plugins activate
 		const idToHook = (id) => ({
 			id: id.replace(/^.+\//, 'built-in:'),
-			apply: require(id)
+			// eslint-disable-next-line security/detect-non-literal-require
+			apply: interopRequireDefault(require(id))
 		});
 		this.builtInHookAppliers = [
 			'../config/base',
-			'../config/prod'
+			'../config/prod',
+			'../tasks/build',
+			'../tasks/serve'
 		].map(idToHook);
 	}
 
-	getHookContextForProject(projectDir) {
-		if (this.hookContexts.has(projectDir)) {
-			return this.hookContexts.get(projectDir);
-		}
-
-		throw new Error(`No project hook context available for "${projectDir}". Create one with "createProjectHookContext".`);
-	}
-
-	createProjectHookContext(projectDir, options) {
+	createHookContext(projectDir, options) {
 		const context = new ProjectHookContext(projectDir, options);
 		this.hookContexts.set(projectDir, context);
 		this.hookClasses.forEach((hookClass, name) => {
@@ -66,3 +61,5 @@ export default class HookManager {
 		return context;
 	}
 }
+
+export default new HookManager();
