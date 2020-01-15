@@ -69,7 +69,8 @@ export function formatRequest(request) {
  * @param {Object} options Project options
  */
 export function configureTitaniumAppPreset(babelConfig, api, options) {
-	const tiapp = options.tiapp;
+	const { project, build } = options;
+	const tiapp = project.tiapp;
 	const appPresetIndex = babelConfig.options.presets.findIndex(presetConfig => {
 		return presetConfig.file.request === '@titanium-sdk/app';
 	});
@@ -79,19 +80,19 @@ export function configureTitaniumAppPreset(babelConfig, api, options) {
 
 	const appPreset = babelConfig.options.presets[appPresetIndex];
 	const presetOptions = appPreset.options || {};
-	const readPkg = (subPackage = '') => {
-		return JSON.parse(fs.readFileSync(path.join(options.sdkPath, subPackage, 'package.json'), 'utf-8'));
+	const readPkg = (platform = '') => {
+		return JSON.parse(fs.readFileSync(path.join(build.sdk.path, platform, 'package.json'), 'utf-8'));
 	};
 
 	const envPresetOptions = presetOptions.env || {};
 	const hasTargetsOption = !!envPresetOptions.targets;
 	if (!hasTargetsOption) {
 		const targets = {};
-		if (options.platform === 'ios') {
+		if (build.platform === 'ios') {
 			const pkg = readPkg('iphone');
 			const defaultMinIosVersion = pkg.minIosVersion;
 			targets.ios = tiapp.ios['min-ios-ver'] || defaultMinIosVersion;
-		} else if (options.platform === 'android') {
+		} else if (build.platform === 'android') {
 			const pkg = readPkg('android');
 			const v8Version = pkg.v8.version;
 			const found = v8Version.match(/(\d+)\.(\d+)\.\d+\.\d+/);
@@ -107,16 +108,28 @@ export function configureTitaniumAppPreset(babelConfig, api, options) {
 	const pkg = readPkg();
 	const titaniumPluginOptions = presetOptions.titanium || {};
 	defaultsDeep(titaniumPluginOptions, {
-		deploytype: process.env.NODE_ENV || 'development',
-		platform: options.platform,
-		target: options.buildTarget,
+		deploytype: build.deployType,
+		platform: build.platform,
+		target: build.target,
 		Ti: {
 			version: pkg.version,
+			buildHash: build.sdk.gitHash,
+			buildDate: build.sdk.buildDate,
 			App: {
-				id: options.tiapp.id,
-				name: options.tiapp.name,
-				version: options.tiapp.version
-			}
+				id: tiapp.id,
+				guid: tiapp.guid,
+				name: tiapp.name,
+				description: tiapp.description,
+				version: tiapp.version,
+				publisher: tiapp.publisher,
+				url: tiapp.url,
+				deployType: build.deployType
+			},
+			Filesystem: {
+				lineEnding: '\n',
+				separator: '/',
+			},
+			Platform: generatePlatformInlines(options)
 		}
 	});
 	presetOptions.titanium = titaniumPluginOptions;
@@ -126,4 +139,23 @@ export function configureTitaniumAppPreset(babelConfig, api, options) {
 		{ dirname: api.getCwd(), type: 'preset' }
 	);
 	babelConfig.options.presets.splice(appPresetIndex, 1, newPresetConfig);
+}
+
+function generatePlatformInlines(options) {
+	const { build } = options;
+	if (build.platform === 'ios')  {
+		const platform = {
+			runtime: 'javascriptcore',
+			manufacturer: 'apple'
+		};
+		if (build.ios.deviceFamily !== 'universal') {
+			platform.osname = build.ios.deviceFamily;
+		}
+	} else {
+		return {
+			name: 'android',
+			osname: 'android',
+			runtime: 'v8'
+		};
+	}
 }
