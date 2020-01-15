@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import readPkg from 'read-pkg';
 
-import { loadModule, resolveModule } from '../loader';
+import { interopRequireDefault, loadModule, resolveModule } from '../loader';
 import HookContext from './index';
 
 // lazy load FSWatcher module
@@ -14,6 +14,12 @@ function lazyWatcher() {
 
 	return FSWatcher;
 }
+
+/**
+ * @typedef HookContextOptions
+ * @property {boolean} watch Whether or not to watch hook files for changes
+ * @property {Object} hookOptions Options object passed into hook functions
+ */
 
 /**
  * A project scoped hook context.
@@ -30,15 +36,15 @@ export default class ProjectHookContext extends HookContext {
 	 * project dir and with the specified options.
 	 *
 	 * @param {string} projectDir Project directory
-	 * @param {Object} options Project options
+	 * @param {HookContextOptions} options Hook context options
 	 */
 	constructor(projectDir, options) {
 		super();
 
 		this.projectDir = projectDir;
 		this.shouldWatch = options.watch;
+		this.hookOptions = options.hookOptions;
 		this.watchers = {};
-		this.options = options;
 	}
 
 	getCwd() {
@@ -51,10 +57,11 @@ export default class ProjectHookContext extends HookContext {
 	}
 
 	loadProjectTypeHookFile() {
-		const projectType = this.options.type;
+		const projectType = this.hookOptions.project.type;
 		const id = `config/${projectType}`;
 		const configHookFile = `../../${id}`;
-		const apply = require(configHookFile);
+		// eslint-disable-next-line security/detect-non-literal-require
+		let apply = interopRequireDefault(require(configHookFile));
 		this.applyHookFile(`built-in:${id}`, apply);
 	}
 
@@ -82,33 +89,34 @@ export default class ProjectHookContext extends HookContext {
 
 	loadPackageHookFiles() {
 		const pkg = readPkg.sync({ cwd: this.projectDir });
-		if (pkg.appcdHooks) {
-			const files = pkg.appcdHooks;
-			if (!Array.isArray(files)) {
-				throw new TypeError(`Invalid type for option 'appcdHooks', expected 'array' but got ${typeof files}`);
+		if (!pkg.appcdHooks) {
+			return;
+		}
+		const files = pkg.appcdHooks;
+		if (!Array.isArray(files)) {
+			throw new TypeError(`Invalid type for option 'appcdHooks', expected 'array' but got ${typeof files}`);
+		}
+
+		files.forEach(file => {
+			const hookId = `local:${file}`;
+			const relativePath = `./${file}`;
+			const fullPath = resolveModule(relativePath, this.projectDir);
+			if (!fullPath) {
+				console.warn(`Could not resolve full path for ${file} in ${this.projectDir}`);
+				return;
+			}
+			if (this.shouldWatch) {
+				const FSWatcher = lazyWatcher();
+				const watcher = new FSWatcher(fullPath);
+				watcher.on('change', e => {
+					console.log(`${hookId} changed`);
+					console.log(e);
+					this.reapplyHookFile(hookId, loadModule(relativePath, this.projectDir, true));
+				});
+				this.watchers[fullPath] = watcher;
 			}
 
-			files.forEach(file => {
-				const hookId = `local:${file}`;
-				const relativePath = `./${file}`;
-				const fullPath = resolveModule(relativePath, this.projectDir);
-				if (!fullPath) {
-					console.warn(`Could not resolve full path for ${file} in ${this.projectDir}`);
-					return;
-				}
-				if (this.shouldWatch) {
-					const FSWatcher = lazyWatcher();
-					const watcher = new FSWatcher(fullPath);
-					watcher.on('change', e => {
-						console.log(`${hookId} changed`);
-						console.log(e);
-						this.reapplyHookFile(hookId, loadModule(relativePath, this.projectDir, true));
-					});
-					this.watchers[fullPath] = watcher;
-				}
-
-				this.applyHookFile(hookId, loadModule(relativePath, this.projectDir, false));
-			});
-		}
+			this.applyHookFile(hookId, loadModule(relativePath, this.projectDir, false));
+		});
 	}
 }

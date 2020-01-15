@@ -1,6 +1,7 @@
 import fs from 'fs';
 import hash from 'hash-sum';
 import path from 'path';
+import Config from 'webpack-chain';
 
 /**
  * The Hook API will be passed into each hook file that is registered with
@@ -129,5 +130,33 @@ export default class HookApi {
 
 		const cacheIdentifier = hash(hashSource);
 		return { cacheDirectory, cacheIdentifier };
+	}
+
+	/**
+	 * Applies all registered `chainWebpack` hooks and returns the resulting
+	 * Webpack config.
+	 *
+	 * @return {Object} Webpack config object
+	 */
+	resolveWebpackConfig() {
+		const config = new Config();
+		this.context.applyHook('chainWebpack', config);
+		return config.toConfig();
+	}
+
+	/**
+	 * Registers a task to run Webpack with different configurations, e.g. for
+	 * production, development or to analyze bundles
+	 *
+	 * @param {string} name Task name
+	 * @param {Object} meta Meta data to describe the task
+	 * @param {Function} fn Task runner function
+	 */
+	registerTask(name, meta, fn) {
+		if (typeof meta === 'function') {
+			fn = meta;
+			meta = null;
+		}
+		this.context.tasks[name] = { run: fn, meta: meta || {} };
 	}
 }

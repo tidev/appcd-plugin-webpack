@@ -5,7 +5,7 @@ const { TitaniumLoaderPlugin } = require('../webpack');
 
 module.exports = function (api, options) {
 	// set target platform for titanium-vue-template-compiler
-	process.env.TARGET_PLATFORM = options.platform;
+	process.env.TARGET_PLATFORM = options.build.platform;
 	const titaniumCompiler = api.requirePeer('titanium-vue-template-compiler');
 
 	api.chainWebpack(config => {
