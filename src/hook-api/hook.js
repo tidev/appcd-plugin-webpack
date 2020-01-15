@@ -10,16 +10,34 @@
  * processing of values.
  */
 export default class Hook {
+	/**
+	 * Constructs a new Hook class
+	 *
+	 * @param {string} name Hook name
+	 */
 	constructor(name) {
 		this.name = name;
 		this.rawValues = [];
 		this.appliedValues = [];
 	}
 
+	/**
+	 * Adds a new raw value to this hook.
+	 *
+	 * Currently only function values are supported.
+	 *
+	 * @param {Function} value Value to add to the list of raw values
+	 * @param {string} sourceHookId Source hint where the value came from
+	 */
 	add(value, sourceHookId) {
 		this.rawValues.push({ value, sourceHookId });
 	}
 
+	/**
+	 * Removes all values previously added under the given source hook id.
+	 *
+	 * @param {string} sourceHookId Source hint where the value came from
+	 */
 	remove(sourceHookId) {
 		const findIndex = () => {
 			return this.rawValues.findIndex(({ sourceHookId: _sourceHookId }) => {
@@ -33,11 +51,19 @@ export default class Hook {
 		}
 	}
 
+	/**
+	 * Clears all raw and applied values.
+	 */
 	clear() {
 		this.rawValues = [];
 		this.appliedValues = [];
 	}
 
+	/**
+	 * Applies all raw values and stores the result.
+	 *
+	 * @param  {...any} args Additional args passed to hook functions.
+	 */
 	apply(...args) {
 		this.appliedValues = [];
 		for (const { value, sourceHookId } of this.rawValues) {

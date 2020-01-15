@@ -2,9 +2,13 @@ import EventEmitter from 'events';
 import path from 'path';
 import defaultsDeep from 'lodash.defaultsdeep';
 
-import { validate, defaults } from './options';
-import HookManager from '../hook-api/manager';
-import { loadProjectOptions, processStats, registerHooks } from '../utils';
+import { schema } from './options';
+import hookManager from '../hook-api/manager';
+import { createHookOptions } from '../hook-api/options';
+import {
+	processStats,
+	validate,
+} from '../utils';
 
 const defaultJsonFields = [
 	'id',
@@ -47,18 +51,11 @@ export default class BuildJob extends EventEmitter {
 			progress: 0
 		};
 		this.tiSymbols = {};
-
-		this.setOptions(options);
-
-		const hookManager = new HookManager();
-		registerHooks(hookManager);
-		const projectOptions = loadProjectOptions(this.projectPath, {
-			platform: this.platform,
-			buildTarget: this.options.buildTarget,
-			sdkPath: this.options.sdkPath,
-			watch: true
+		this.options = options;
+		this.hooks = hookManager.createHookContext(this.projectPath, {
+			watch: true,
+			hookOptions: createHookOptions(this.options)
 		});
-		this.hooks = hookManager.createProjectHookContext(this.projectPath, projectOptions);
 		this.hooks.on('change', () => {
 			this.restart();
 		});
@@ -93,22 +90,29 @@ export default class BuildJob extends EventEmitter {
 		this.emit('state', this, this._state);
 	}
 
-	setOptions(newOptions) {
-		newOptions = defaultsDeep(newOptions, this.options);
-		this.options = defaultsDeep(newOptions, defaults());
-		validate(this.options);
+	/**
+	 * Validates and assigns the options object for this job.
+	 *
+	 * A few commonly used values from the options object will be directly
+	 * assigned to `this` for easier access.
+	 *
+	 * @param {Object} newOptions Options object
+	 */
+	set options(newOptions) {
+		newOptions = defaultsDeep(newOptions, this._options);
+		validate(schema, newOptions);
+		this._options = newOptions;
 
-		const {
-			projectPath,
-			projectType,
-			platform,
-			deployType
-		} = this.options;
-		this.name = projectPath.split('/').pop();
-		this.projectPath = projectPath;
-		this.projectType = projectType;
-		this.platform = platform;
-		this.deployType = deployType;
+		const { project, build } = this._options;
+		this.name = project.name;
+		this.projectPath = project.path;
+		this.projectType = project.type;
+		this.platform = build.platform;
+		this.deployType = build.deployType;
+	}
+
+	get options () {
+		return this._options;
 	}
 
 	async start() {
@@ -120,24 +124,13 @@ export default class BuildJob extends EventEmitter {
 		this.cleanupJobData();
 		let taskName = 'build';
 		// @TODO switch to serve task for non-production builds
-
 		const args = [
-			path.resolve(__dirname, '..', 'tasks', `${taskName}.js`),
-			'--project', this.projectPath,
-			'--platform', this.platform,
-			'--target', this.options.buildTarget,
-			'--sdk', this.options.sdkPath,
+			path.resolve(__dirname, 'task-runner.js'),
+			taskName
 		];
 
-		let watch = this.deployType !== 'production';
-		if (typeof this.options.watch !== 'undefined') {
-			watch = this.options.watch;
-		}
-		if (watch) {
-			args.push('--watch');
-		}
-
-		this.output = `\u001b[90m$ appcd-plugin-webpack ${taskName} ${args.slice(1).join(' ')}\u001b[0m\n\n`;
+		const options = this.options;
+		this.output = `\u001b[90m$ appcd-plugin-webpack ${taskName} ${JSON.stringify(options)}\u001b[0m\n\n`;
 
 		const startTimeout = setTimeout(() => {
 			throw new Error('Webpack build failed to spawn within 5 sec.');
@@ -159,6 +152,7 @@ export default class BuildJob extends EventEmitter {
 					this.pid = data.pid;
 					this.state = BuildJob.STATE_BUILDING;
 					this.isStarting = false;
+					appcd.call(`/appcd/subprocess/send/${this.pid}`, { data: options });
 					return Promise.resolve();
 				}
 				case 'stdout': {

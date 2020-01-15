@@ -14,8 +14,24 @@ export default class HookContext extends EventEmitter {
 	constructor() {
 		super();
 
+		/**
+		 * Map of hooks known in this context.
+		 *
+		 * @type Map<string, Hook>
+		 */
 		this.hooks = new Map();
-		this.options = {};
+		/**
+		 * Options object that will be passed into hook functions
+		 *
+		 * @type Object
+		 */
+		this.hookOptions = {};
+		/**
+		 * Map of tasks known in this context.
+		 *
+		 * @type Object
+		 */
+		this.tasks = {};
 	}
 
 	/**
@@ -66,7 +82,11 @@ export default class HookContext extends EventEmitter {
 	 */
 	applyHookFile(id, apply) {
 		const hookApi = new HookApi(id, this);
-		apply(hookApi, this.options);
+		try {
+			apply(hookApi, this.hookOptions);
+		} catch (e) {
+			throw new Error(`Failed to load and apply hook "${id}". ${e.message}`);
+		}
 	}
 
 	/**
@@ -80,15 +100,21 @@ export default class HookContext extends EventEmitter {
 	reapplyHookFile(id, apply) {
 		this.removeHookFile(id, false);
 		this.applyHookFile(id, apply);
-		this.emit('change', { id, type: 'change' });
+		this.emit('change', { id, type: 'changed' });
 	}
 
+	/**
+	 * Removes all hooks from the specified hook file.
+	 *
+	 * @param {string} id Hook file identifier
+	 * @param {boolean} shouldEmit Whether or not to emit change event
+	 */
 	removeHookFile(id, shouldEmit = true) {
 		this.hooks.forEach(hook => {
 			hook.remove(id);
 		});
 		if (shouldEmit) {
-			this.emit('change', { id, type: 'remove' });
+			this.emit('change', { id, type: 'removed' });
 		}
 	}
 
