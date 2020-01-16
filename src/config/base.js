@@ -14,7 +14,7 @@ const {
 const TerserPlugin = require('terser-webpack-plugin');
 
 const { configureTitaniumAppPreset, generateTranspileDepRegex } = require('../utils');
-const { ApiTrackerPlugin, BootstrapPlugin, StateNotifierPlugin } = require('../webpack');
+const { ApiTrackerPlugin, BootstrapPlugin } = require('../webpack');
 
 module.exports = function (api, options) {
 	const projectDir = api.getCwd();
