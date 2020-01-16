@@ -85,7 +85,8 @@ export default class HookContext extends EventEmitter {
 		try {
 			apply(hookApi, this.hookOptions);
 		} catch (e) {
-			throw new Error(`Failed to load and apply hook "${id}". ${e.message}`);
+			e.message = `Failed to load and apply hook "${id}". ${e.message}`;
+			throw e;
 		}
 	}
 
