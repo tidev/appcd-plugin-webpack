@@ -13,9 +13,10 @@ module.exports = function (api, options) {
 	const projectDir = api.getCwd();
 	const alloyRoot = path.dirname(api.resolvePeer('alloy'));
 	const { createCompileConfig, createCompiler } = api.requirePeer('alloy-compiler');
+	const { build } = options;
 	const alloyConfig = {
-		platform: options.platform,
-		deploytype: options.deployType
+		platform: build.platform,
+		deploytype: build.deployType
 	};
 	const compileConfig = createCompileConfig({ projectDir, alloyConfig });
 	const alloyCompiler = createCompiler({ compileConfig, webpack: true });
@@ -60,7 +61,7 @@ module.exports = function (api, options) {
 					.loader('alloy-loader')
 					.options({
 						compiler: alloyCompiler,
-						platform: options.platform
+						platform: build.platform
 					})
 					.end()
 				.use('cache-loader')
@@ -97,7 +98,7 @@ module.exports = function (api, options) {
 			.use(require.resolve('alloy-loader/lib/plugin'), [
 				{
 					compiler: alloyCompiler,
-					platform: options.platform
+					platform: build.platform
 				}
 			]);
 		// TODO: Copy widget resources and merge i18n
@@ -105,7 +106,7 @@ module.exports = function (api, options) {
 			.use(CopyPlugin, [
 				[
 					// copy app/platform/<splatform>
-					{ from: `platform/${options.platform}`, to: `../platform/${options.platform}` },
+					{ from: `platform/${build.platform}`, to: `../platform/${build.platform}` },
 					// copy app/i18n
 					{ from: 'i18n', to: '../i18n' },
 				]
