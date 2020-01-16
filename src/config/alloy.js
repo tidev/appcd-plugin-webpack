@@ -55,8 +55,15 @@ module.exports = function (api, options) {
 
 		// module rules ------------------------------------------------------------
 
+		let babelOptions;
 		config.module
 			.rule('js')
+				.use('babel-loader')
+					.tap(options => {
+						babelOptions = options;
+						return options;
+					})
+					.end()
 				.use('alloy-loader')
 					.loader('alloy-loader')
 					.options({
@@ -69,6 +76,7 @@ module.exports = function (api, options) {
 						return api.generateCacheConfig('compile-cache', {
 							'@babel/core': require('@babel/core/package.json').version,
 							'babel-loader': require('babel-loader/package.json').version,
+							'dynamic-babel-config': babelOptions,
 							alloy: api.requirePeer('alloy/package.json').version,
 							'alloy-compiler': api.requirePeer('alloy-compiler/package.json').version
 						}, [
