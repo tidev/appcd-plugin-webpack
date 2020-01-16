@@ -88,7 +88,8 @@ module.exports = function (api, options) {
 					.loader('cache-loader')
 					.options(api.generateCacheConfig('babel-loader', {
 						'@babel/core': require('@babel/core/package.json').version,
-						'babel-loader': require('babel-loader/package.json').version
+						'babel-loader': require('babel-loader/package.json').version,
+						'dynamic-babel-config': babelConfig.options
 					}, [
 						'babel.config.js'
 					]))
