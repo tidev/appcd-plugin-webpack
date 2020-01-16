@@ -151,6 +151,7 @@ function generatePlatformInlines(options) {
 		if (build.ios.deviceFamily !== 'universal') {
 			platform.osname = build.ios.deviceFamily;
 		}
+		return platform;
 	} else {
 		return {
 			name: 'android',
