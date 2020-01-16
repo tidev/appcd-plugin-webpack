@@ -36,7 +36,7 @@ class HookManager {
 	 */
 	resolveBuiltInHooks() {
 		const idToHook = (id) => ({
-			id: id.replace(/^.+\//, 'built-in:'),
+			id: id.replace(/^\.+\//, 'built-in:'),
 			// eslint-disable-next-line security/detect-non-literal-require
 			apply: interopRequireDefault(require(id))
 		});

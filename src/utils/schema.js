@@ -19,7 +19,7 @@ export const buildSchema = joi.object({
 	deployType: joi.string()
 		.valid('development', 'test', 'production')
 		.required(),
-	buildTarget: joi.string()
+	target: joi.string()
 		.valid('device')
 		.required()
 		.when('platform', { is: 'android', then: joi.valid('emulator', 'dist-playstore') })
