@@ -61,18 +61,33 @@ export default class BuildJob extends EventEmitter {
 		});
 	}
 
+	/**
+	 * Webpack is currently building.
+	 */
 	static get STATE_BUILDING() {
 		return 'building';
 	}
 
+	/**
+	 * Webpack finished compiling and is currently idle.
+	 *
+	 * If `watch` mode is enabled it is watching for changes and will
+	 * automatically start a new compilation.
+	 */
 	static get STATE_READY() {
 		return 'ready';
 	}
 
+	/**
+	 * The Webpack task was stopped.
+	 */
 	static get STATE_STOPPED() {
 		return 'stopped';
 	}
 
+	/**
+	 * The Webpack task existed with an error.
+	 */
 	static get STATE_ERROR() {
 		return 'error';
 	}
