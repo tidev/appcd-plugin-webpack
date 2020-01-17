@@ -51,7 +51,7 @@
     "lodash.mapvalues": "^4.6.0",
     "lodash.transform": "^4.6.0",
     "minimist": "^1.2.0",
-    "node-titanium-sdk": "^3.2.2",
+    "node-titanium-sdk": "^4.2.0",
     "nuxt": "^2.10.2",
     "pretty-time": "^1.1.0",
     "read-pkg": "^5.2.0",
@@ -88,7 +88,7 @@
     "xterm-addon-web-links": "^0.2.1"
   },
   "appcd": {
-    "appcdVersion": "^3.1.0",
+    "appcdVersion": "^3.2.0",
     "inactivityTimeout": 600000,
     "name": "webpack",
     "type": "external"
