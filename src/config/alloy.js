@@ -11,6 +11,7 @@ const {
 
 module.exports = function (api, options) {
 	const projectDir = api.getCwd();
+	const appDir = path.join(projectDir, 'app');
 	const alloyRoot = path.dirname(api.resolvePeer('alloy'));
 	const { createCompileConfig, createCompiler } = api.requirePeer('alloy-compiler');
 	const { build } = options;
@@ -23,6 +24,9 @@ module.exports = function (api, options) {
 	const backboneVersion = compileConfig.backbone ? compileConfig.backbone : '0.9.2';
 
 	options.transpileDependencies.push(new RegExp('node_modules[\\/]alloy'));
+
+	const theme = compileConfig.theme;
+	// TODO: merge i18n folders from app, theme and widgets
 
 	api.chainWebpack(config => {
 		// entry -------------------------------------------------------------------
@@ -109,14 +113,36 @@ module.exports = function (api, options) {
 					platform: build.platform
 				}
 			]);
-		// TODO: Copy widget resources and merge i18n
-		config.plugin('copy-resources')
+
+		const copyThemeOptions = [];
+		if (theme) {
+			const themeRoot = path.join(
+				appDir, 'themes', theme
+			);
+
+			// copy app/theme/<theme>/platform/<platform>
+			const themePlatformPath = path.join(
+				themeRoot, 'platform', build.platform
+			);
+			copyThemeOptions.push({
+				from: themePlatformPath,
+				to: `../platform/${build.platform}`
+			});
+
+			// copy app/theme/<theme>/assets
+			const themeAssetsPath = path.join(themeRoot, 'assets');
+			copyThemeOptions.push({
+				from: themeAssetsPath,
+				to: '.'
+			});
+		}
+		config.plugin('copy-theme-files')
+			.use(CopyPlugin, [ copyThemeOptions ]);
+		config.plugin('copy-platform')
 			.use(CopyPlugin, [
 				[
 					// copy app/platform/<splatform>
-					{ from: `platform/${build.platform}`, to: `../platform/${build.platform}` },
-					// copy app/i18n
-					{ from: 'i18n', to: '../i18n' },
+					{ from: `platform/${build.platform}`, to: `../platform/${build.platform}` }
 				]
 			]);
 		config.plugin('copy-assets')
