@@ -71,8 +71,7 @@ module.exports = function (api, options) {
 				.use('alloy-loader')
 					.loader('alloy-loader')
 					.options({
-						compiler: alloyCompiler,
-						platform: build.platform
+						compiler: alloyCompiler
 					})
 					.end()
 				.use('cache-loader')
