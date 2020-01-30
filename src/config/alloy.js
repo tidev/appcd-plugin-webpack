@@ -151,6 +151,17 @@ module.exports = function (api, options) {
 					{ from: 'assets', to: '.' }
 				]
 			]);
+
+		const copyWidgetAssetsOptions = [];
+		alloyCompiler.compilationMeta.widgets.forEach(widget => {
+			copyWidgetAssetsOptions.push({
+				from: path.join(widget.dir, 'assets'),
+				to: `./${widget.manifest.id}/`
+			});
+		});
+		config.plugin('copy-widget-assets')
+			.use(CopyPlugin, [ copyWidgetAssetsOptions ]);
+
 		config.plugin('externals')
 			.use(ExternalsPlugin, [
 				'commonjs',
