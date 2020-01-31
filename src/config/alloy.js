@@ -1,6 +1,7 @@
 /* eslint indent: "off" */
 
 const CopyPlugin = require('copy-webpack-plugin');
+const fs = require('fs');
 const path = require('path');
 const {
 	DefinePlugin,
@@ -115,25 +116,29 @@ module.exports = function (api, options) {
 
 		const copyThemeOptions = [];
 		if (theme) {
-			const themeRoot = path.join(
+			const themeRoot = path.posix.join(
 				appDir, 'themes', theme
 			);
 
 			// copy app/theme/<theme>/platform/<platform>
-			const themePlatformPath = path.join(
+			const themePlatformPath = path.posix.join(
 				themeRoot, 'platform', build.platform
 			);
-			copyThemeOptions.push({
-				from: themePlatformPath,
-				to: `../platform/${build.platform}`
-			});
+			if (fs.existsSync(themePlatformPath)) {
+				copyThemeOptions.push({
+					from: themePlatformPath,
+					to: `../platform/${build.platform}`
+				});
+			}
 
 			// copy app/theme/<theme>/assets
-			const themeAssetsPath = path.join(themeRoot, 'assets');
-			copyThemeOptions.push({
-				from: themeAssetsPath,
-				to: '.'
-			});
+			const themeAssetsPath = path.posix.join(themeRoot, 'assets');
+			if (fs.existsSync(themeAssetsPath)) {
+				copyThemeOptions.push({
+					from: themeAssetsPath,
+					to: '.'
+				});
+			}
 		}
 		config.plugin('copy-theme-files')
 			.use(CopyPlugin, [ copyThemeOptions ]);
@@ -154,10 +159,13 @@ module.exports = function (api, options) {
 
 		const copyWidgetAssetsOptions = [];
 		alloyCompiler.compilationMeta.widgets.forEach(widget => {
-			copyWidgetAssetsOptions.push({
-				from: path.join(widget.dir, 'assets'),
-				to: `./${widget.manifest.id}/`
-			});
+			const widgetAssetPath = path.posix.join(widget.dir, 'assets');
+			if (fs.existsSync(widgetAssetPath)) {
+				copyWidgetAssetsOptions.push({
+					from: path.join(widget.dir, 'assets'),
+					to: `./${widget.manifest.id}/`
+				});
+			}
 		});
 		config.plugin('copy-widget-assets')
 			.use(CopyPlugin, [ copyWidgetAssetsOptions ]);
