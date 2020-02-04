@@ -25,9 +25,19 @@ module.exports = function (api, options) {
 	const backboneVersion = compileConfig.backbone ? compileConfig.backbone : '0.9.2';
 
 	options.transpileDependencies.push(new RegExp('node_modules[\\/]alloy'));
+	alloyCompiler.compilationMeta.widgets.forEach((widget, widgetPath) => {
+		if (/node_modules/.test(widgetPath)) {
+			const widgetNodeModuleName = widgetPath.substr(widgetPath
+				.lastIndexOf('node_modules') + 13)
+				.replace(/\/\\/g, '');
+			options.transpileDependencies.push(
+				// eslint-disable-next-line security/detect-non-literal-regexp
+				new RegExp(`node_modules[\\/]${widgetNodeModuleName}`)
+			);
+		}
+	});
 
 	const theme = compileConfig.theme;
-	// TODO: merge i18n folders from app, theme and widgets
 
 	api.chainWebpack(config => {
 		// entry -------------------------------------------------------------------
