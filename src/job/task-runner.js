@@ -1,6 +1,5 @@
 import { schema } from './options';
-import hookManager from '../hook-api/manager';
-import { createHookOptions } from '../hook-api/options';
+import pluginService from '../plugin-api/service';
 import { registerHooks, validate } from '../utils';
 
 const initTimeout = setTimeout(() => {
@@ -13,13 +12,10 @@ process.once('message', data => {
 	validate(schema, data);
 	const options = data;
 
-	registerHooks(hookManager);
+	registerHooks(pluginService);
 
 	const { project } = options;
-	const context = hookManager.createHookContext(project.path, {
-		watch: false,
-		hookOptions: createHookOptions(options)
-	});
+	const context = pluginService.createPluginContext(project.path, options);
 	const name = process.argv[2];
 	const task = context.tasks[name];
 	if (!task) {

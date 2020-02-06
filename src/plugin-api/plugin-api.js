@@ -3,27 +3,33 @@ import hash from 'hash-sum';
 import path from 'path';
 import Config from 'webpack-chain';
 
+/** @typedef {import("./context").default} PluginContext */
+
 /**
- * The Hook API will be passed into each hook file that is registered with
- * appcd.
+ * The Plugin API will be passed into the function exported by plugins and can
+ * then be used to tap into the individual hooks.
  *
- * Each function exported from a hook file will receive a unique HookApi
- * instance. This allows for better tracking of failed individual hooks.
+ * This represets the front-facing API that plugin creators interact with. Each
+ * function exported from a plugin file will receive a unique PluginApi
+ * instance. This allows for better tracking of failed hooks from plugins.
  */
-export default class HookApi {
+export default class PluginApi {
 	/**
-	 * Constructs a new Hook API.
+	 * Constructs a new Plugin API.
 	 *
-	 * For each registered hook in the passed hook context a new function is
+	 * For each registered hook in the passed plugin context a new function is
 	 * added to this class that delegates to the hook's `add` method.
 	 *
-	 * @param {string} id Unique identifier for the current hook file.
-	 * @param {HookContext} context Project hook context that this hook api delegates to.
+	 * @param {string} id Unique identifier for the current plugin.
+	 * @param {PluginContext} context Plugin context that this PluginApi delegates to.
 	 */
 	constructor(id, context) {
 		this.id = id;
 		this.context = context;
 		context.hooks.forEach((hook, name) => {
+			if (this[name]) {
+				throw new Error(`Restricted hook name used. "${name}" is a pre-defined PluginApi method name.`);
+			}
 			this[name] = (value) => hook.add(value, id);
 		});
 	}
@@ -34,7 +40,7 @@ export default class HookApi {
 	 * @return {string} Current working directory
 	 */
 	getCwd() {
-		return this.context.getCwd();
+		return this.context.cwd;
 	}
 
 	/**
@@ -76,6 +82,16 @@ export default class HookApi {
 	requirePeer(request) {
 		// eslint-disable-next-line security/detect-non-literal-require
 		return require(this.resolvePeer(request));
+	}
+
+	/**
+	 * Checks if the context has a given plugin.
+	 *
+	 * @param {string} id Plugin identifier.
+	 * @return {boolean}
+	 */
+	hasPlugin(id) {
+		return this.context.plugins.has(id);
 	}
 
 	/**

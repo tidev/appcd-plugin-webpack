@@ -1,10 +1,10 @@
+import FSWatcher from 'appcd-fswatcher';
 import EventEmitter from 'events';
 import path from 'path';
 import defaultsDeep from 'lodash.defaultsdeep';
 
 import { schema } from './options';
-import hookManager from '../hook-api/manager';
-import { createHookOptions } from '../hook-api/options';
+import pluginService from '../plugin-api/service';
 import {
 	processStats,
 	validate,
@@ -52,13 +52,18 @@ export default class BuildJob extends EventEmitter {
 		};
 		this.tiSymbols = {};
 		this.options = options;
-		this.hooks = hookManager.createHookContext(this.projectPath, {
-			watch: true,
-			hookOptions: createHookOptions(this.options)
-		});
-		this.hooks.on('change', () => {
-			this.restart();
-		});
+
+		if (this.options.watch) {
+			const pluginContext = pluginService.createPluginContext(this.projectPath, this.options);
+			pluginContext.applyHook('watch').appliedValues.forEach(({ value: watchList }) => {
+				for (const file of watchList) {
+					const watcher = new FSWatcher(path.join(this.projectPath, file));
+					watcher.on('change', () => {
+						this.restart();
+					});
+				}
+			});
+		}
 	}
 
 	/**
