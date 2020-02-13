@@ -31,7 +31,7 @@ export function resolveModule(request, context) {
 export function loadModule(request, context, force = false) {
 	const resolvedPath = resolveModule(request, context);
 	if (!resolvedPath) {
-		throw new Error(`Could not resolve ${request}`);
+		throw new Error(`Could not resolve ${request} from ${context}`);
 	}
 
 	if (force) {

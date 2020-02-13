@@ -1,5 +1,10 @@
-import PluginApi from './plugin-api';
+import FSWatcher from 'appcd-fswatcher';
 import { EventEmitter } from 'events';
+import path from 'path';
+import readPkg from 'read-pkg';
+
+import { loadModule } from './loader';
+import PluginApi from './plugin-api';
 
 /**
  * The plugin context.
@@ -36,6 +41,10 @@ export default class PluginContext extends EventEmitter {
 		 */
 		this.options = options;
 		/**
+		 * List of built-in plugins
+		 */
+		this.builtInPlugins = [];
+		/**
 		 * Map of plugin identifiers and their apply functions.
 		 *
 		 * @type Map<string, Function>
@@ -47,6 +56,12 @@ export default class PluginContext extends EventEmitter {
 		 * @type Object
 		 */
 		this.tasks = {};
+		/**
+		 * Map of file watchers
+		 *
+		 * @type Map<string, FSWatcher>
+		 */
+		this.watchers = new Map();
 	}
 
 	/**
@@ -80,6 +95,73 @@ export default class PluginContext extends EventEmitter {
 		return this.hooks.get(name);
 	}
 
+	resolveAndApplyPlugins(builtInPlugins) {
+		if (builtInPlugins) {
+			this.builtInPlugins = builtInPlugins;
+		}
+		const projectType = this.options.project.type;
+		const projectConfigPlugin = {
+			id: `built-in:config/${projectType}`,
+			apply: loadModule(`./${projectType}`, path.resolve(__dirname, '..', 'config'))
+		};
+		const plugins = this.resolvePlugins(this.builtInPlugins, [ projectConfigPlugin ]);
+		plugins.forEach(({ id, apply }) => this.applyPlugin(id, apply));
+	}
+
+	resolvePlugins(builtInPlugins, inlinePlugins) {
+		let plugins = [].concat(builtInPlugins);
+
+		if (inlinePlugins) {
+			plugins = plugins.concat(inlinePlugins);
+		}
+
+		const { cwd } = this;
+		const { watch } = this.options;
+		if (watch) {
+			const pkgPath = path.join(cwd, 'package.json');
+			const pkgWatcher = new FSWatcher(pkgPath);
+			pkgWatcher.on('change', () => {
+				this.reset();
+				this.resolveAndApplyPlugins();
+				this.emit('reload');
+			});
+			this.watchers.set(pkgPath, pkgWatcher);
+		}
+		const pkg = readPkg.sync({ cwd });
+		// TODO: Plugins from pkg.devDependencies and pkg.dependencies
+
+		if (pkg.appcdWebpackPlugins) {
+			const files = pkg.appcdWebpackPlugins;
+			if (!Array.isArray(files)) {
+				throw new TypeError(`Invalid type for option "appcdWebpackPlugins", expected "array" but got "${typeof files}"`);
+			}
+
+			plugins = plugins.concat(files.map(file => {
+				const pluginId = `local:${file}`;
+				if (watch) {
+					const fileWatcher = new FSWatcher(path.join(cwd, file));
+					fileWatcher.on('change', e => {
+						if (e.action === 'change') {
+							this.reapplyPlugin(pluginId, loadModule(`./${file}`, cwd, true));
+						} else if (e.action === 'delete') {
+							fileWatcher.close();
+							this.watchers.delete(file);
+							this.removePlugin(pluginId);
+						}
+					});
+					this.watchers.set(file, fileWatcher);
+				}
+
+				return {
+					id: pluginId,
+					apply: loadModule(`./${file}`, cwd, true)
+				};
+			}));
+		}
+
+		return plugins;
+	}
+
 	/**
 	 * Applies a plugin.
 	 *
@@ -92,7 +174,7 @@ export default class PluginContext extends EventEmitter {
 		try {
 			apply(pluginApi, this.options);
 		} catch (e) {
-			e.message = `Failed to load and apply plugin "${id}". ${e.message}`;
+			e.message = `Failed to apply plugin "${id}". ${e.message}`;
 			throw e;
 		}
 	}
@@ -161,5 +243,13 @@ export default class PluginContext extends EventEmitter {
 		await hook.apply(...args);
 
 		return hook;
+	}
+
+	reset() {
+		this.hooks.forEach(hook => hook.clear());
+		this.plugins.clear();
+		this.tasks = {};
+		this.watchers.forEach(watcher => watcher.close());
+		this.watchers.clear();
 	}
 }
