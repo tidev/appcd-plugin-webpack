@@ -85,7 +85,7 @@ export default class PluginApi {
 	}
 
 	/**
-	 * Checks if the context has a given plugin.
+	 * Checks if there is another plugin with the given identifier.
 	 *
 	 * @param {string} id Plugin identifier.
 	 * @return {boolean}
