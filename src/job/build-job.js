@@ -58,10 +58,19 @@ export default class BuildJob extends EventEmitter {
 			pluginContext.applyHook('watch').appliedValues.forEach(({ value: watchList }) => {
 				for (const file of watchList) {
 					const watcher = new FSWatcher(path.join(this.projectPath, file));
-					watcher.on('change', () => {
+					watcher.on('change', e => {
+						this.writeOutput(`Restarting due to changes in ${file}`);
 						this.restart();
 					});
 				}
+			});
+			pluginContext.on('change', e => {
+				this.writeOutput(`Restarting due to changes in plugin "${e.id}"`);
+				this.restart();
+			});
+			pluginContext.on('reload', e => {
+				this.writeOutput('Restarting due to Plugin API reload');
+				this.restart();
 			});
 		}
 	}
@@ -176,13 +185,11 @@ export default class BuildJob extends EventEmitter {
 					return Promise.resolve();
 				}
 				case 'stdout': {
-					this.output += data.output;
-					this.emit('output', data.output);
+					this.writeOutput(data.output);
 					break;
 				}
 				case 'stderr': {
-					this.output += data.output;
-					this.emit('output', data.output);
+					this.writeOutput(data.output);
 					break;
 				}
 				case 'ipc': {
@@ -234,13 +241,9 @@ export default class BuildJob extends EventEmitter {
 	}
 
 	/**
-	 * Restarts the Webpack build task, but only if it was prevously running.
+	 * Restarts the Webpack build task.
 	 */
 	async restart() {
-		if (this.pid === null) {
-			return;
-		}
-
 		await this.stop();
 		return this.start();
 	}
@@ -305,6 +308,11 @@ export default class BuildJob extends EventEmitter {
 		this.invalidationReason = null;
 
 		this.emit('done', this);
+	}
+
+	writeOutput(output) {
+		this.output += output;
+		this.emit('output', output);
 	}
 
 	toJson(template = 'default') {
