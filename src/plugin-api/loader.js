@@ -1,46 +1,3 @@
-/**
- * A fallback for require.resolve.
- *
- * The built-in require.resolve doesn't work for request outside of a appcd
- * plugin since they are restricted due to PluginModule.
- *
- * @param {string} request The module to resolve.
- * @param {Object} options Resolve options.
- * @param {Array<string>} options.paths Paths from which module resolution will start.
- * @return {string} Resolved module path.
- */
-function resolveFallback (request, options) {
-	const Module = require('module');
-	const isMain = false;
-	const fakeParent = new Module('', null);
-
-	const paths = [];
-
-	for (let i = 0; i < options.paths.length; i++) {
-		const path = options.paths[i];
-		fakeParent.paths = Module._nodeModulePaths(path);
-		const lookupPaths = Module._resolveLookupPaths(request, fakeParent, true);
-
-		if (!paths.includes(path)) {
-			paths.push(path);
-		}
-
-		for (let j = 0; j < lookupPaths.length; j++) {
-			if (!paths.includes(lookupPaths[j])) {
-				paths.push(lookupPaths[j]);
-			}
-		}
-	}
-
-	const filename = Module._findPath(request, paths, isMain);
-	if (!filename) {
-		const err = new Error(`Cannot find module '${request}'`);
-		err.code = 'MODULE_NOT_FOUND';
-		throw err;
-	}
-	return filename;
-}
-
 const resolve = require.resolve;
 
 /**
@@ -56,7 +13,9 @@ export function resolveModule(request, context) {
 		resolvedPath = resolve(request, {
 			paths: [ context ]
 		});
-	} catch (e) {}
+	} catch (e) {
+		// errors are silently ignored and we return indefined instead
+	}
 	return resolvedPath;
 }
 
@@ -71,15 +30,15 @@ export function resolveModule(request, context) {
  */
 export function loadModule(request, context, force = false) {
 	const resolvedPath = resolveModule(request, context);
-	if (resolvedPath) {
-		if (force) {
-			clearRequireCache(resolvedPath);
-		}
-
-		return interopRequireDefault(require(resolvedPath));
+	if (!resolvedPath) {
+		throw new Error(`Could not resolve ${request} from ${context}`);
 	}
 
-	throw new Error(`Could not load hook ${request}`);
+	if (force) {
+		clearRequireCache(resolvedPath);
+	}
+	// eslint-disable-next-line security/detect-non-literal-require
+	return interopRequireDefault(require(resolvedPath));
 }
 
 /**

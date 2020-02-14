@@ -11,6 +11,8 @@ import {
 } from '../utils/schema';
 
 export const schema = createSchema(joi => joi.object({
+	project: projectSchema,
+	build: buildSchema,
 	type: joi.string()
 		.valid('alloy', 'angular', 'classic', 'vue')
 		.required(),
@@ -21,16 +23,14 @@ export const schema = createSchema(joi => joi.object({
 				.instance(RegExp)
 		),
 	watch: joi.boolean()
-		.required(),
-	project: projectSchema,
-	build: buildSchema
+		.required()
 }));
 
 const defaults = () => ({
-	transpileDependencies: [],
+	transpileDependencies: []
 });
 
-export function createHookOptions(baseOptions) {
+export function createPluginOptions(baseOptions) {
 	const { project, build, watch } = baseOptions;
 	let options = {};
 
@@ -40,8 +40,8 @@ export function createHookOptions(baseOptions) {
 	}
 	const tiapp = new tiappxml(tiAppPath);
 	options = {
-		...tiapp.webpack,
-		watch
+		watch,
+		...tiapp.webpack
 	};
 	options.project = { tiapp, ...project };
 	options.build = build;
