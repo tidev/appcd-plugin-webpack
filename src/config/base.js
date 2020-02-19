@@ -14,7 +14,7 @@ const {
 const TerserPlugin = require('terser-webpack-plugin');
 
 const { configureTitaniumAppPreset, generateTranspileDepRegex } = require('../utils');
-const { ApiTrackerPlugin, BootstrapPlugin } = require('../webpack');
+const { AliasExternalsPlugin, ApiTrackerPlugin, BootstrapPlugin } = require('../webpack');
 
 module.exports = function (api, options) {
 	const projectDir = api.getCwd();
@@ -139,9 +139,14 @@ module.exports = function (api, options) {
 					'process.env.TARGET_PLATFORM': JSON.stringify(platformName)
 				}
 			]);
+		const nativeModules = [ ...new Set(options.project.tiapp.modules.map(m => m.id)) ];
 		config.plugin('titanium-externals')
 			.use(TitaniumExternalsPlugins, [
-				[ ...new Set(options.project.tiapp.modules.map(m => m.id)) ]
+				nativeModules
+			]);
+		config.plugin('alias-externals')
+			.use(AliasExternalsPlugin, [
+				nativeModules
 			]);
 		config.plugin('app.js')
 			.use(GenerateAppJsPlugin, [
