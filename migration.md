@@ -2,6 +2,10 @@
 
 This migration guides walks you though the steps you need to take to enable Webpack in your existing Titanium project.
 
+## Introduction
+
+Using Webpack in your Titanium project provides significant performance improvements in terms of build times.
+
 ## Getting started
 
 First make sure you have at least version 3.1.0+ of [appc-daemon](https://github.com/appcelerator/appc-daemon) installed. The Appcelerator Daemon (or appcd for short) powers our Webpack build pipeline and manages Webpack builds in the background.
@@ -36,7 +40,7 @@ For your existing projects you can choose between `alloy` and `classic`. The pro
 
 ### Configure Babel
 
-[babel-loader](https://github.com/babel/babel-loader) is pre-configured for every Webpack enabled Titanium project. To properly transpile your JS code to the target platform you are building for, you need to install the [titanium-babel-preset-app](https://github.com/appcelerator/babel-preset-app#readme) into your project and create `babel.config.js` with the following content:
+[babel-loader](https://github.com/babel/babel-loader) is pre-configured for every Webpack enabled Titanium project. To properly transpile your JS code to the target platform you are building for, you need to install [@titanium-sdk/babel-preset-app](https://github.com/appcelerator/babel-preset-app#readme) into your project and create a `babel.config.js` with the following content:
 
 ```js
 module.exports = {
@@ -66,11 +70,25 @@ These are some general guidelines you should follow when using Webpack with Tita
 
 ### `require`/`import` with Webpack
 
-When bundling code with Webpack there are a few rules you need to follow.
+When bundling code with Webpack there are a few rules you need to follow in your `require`/`import` statements.
 
-Dynamic requires need to be adopted to work well with webpack. See [require with expression](https://webpack.js.org/guides/dependency-management/#require-with-expression).
+#### Dynamic requires
 
-Non-relative requires are only valid for built-in Node modules or NPM packages. The Titanium `require` implementation has a non-spec fallback to resolve non-relative requires from the app root. This is not supported when using Webpack. `require('my-local-module')` → `require('../my-local-module')`
+Dynamic requires with expressions need to be adopted to work well with webpack. See [require with expression](https://webpack.js.org/guides/dependency-management/#require-with-expression) from Webpack docs for more details.
+
+#### Titanium non-spec require
+
+The Titanium `require` implementation has a non-spec fallback to resolve non-relative requires from the app root. This is not supported when using Webpack and you need to adjust your require expressions accordingly.
+
+```js
+// Unsupported require to `app/lib/my-local-module.js` in an Alloy app
+require('my-local-module')
+
+// How it should be with Webpack
+require('../my-local-module')
+```
+
+See the following section about aliases how you can avoid writing overly long relative imports.
 
 ### Aliases
 
@@ -91,7 +109,7 @@ You can install NPM packages directly into your project root directory and requi
 
 ### Asset management
 
-For easier transitioning Webpack copies all assets from `app/assets` to your app for Classic and Alloy projects by default. However, since [file-loader](https://github.com/webpack-contrib/file-loader) is also pre-configured you can make use of if you want and disable the legacy copying of all asset.
+For easier transitioning Webpack copies all assets from `app/assets` to your app for Classic and Alloy projects by default. However, since [file-loader](https://github.com/webpack-contrib/file-loader) is also pre-configured you can make use of it if you'd like and disable the legacy copying of all asset.
 
 For example, let's assume you have an image view defined like this:
 
@@ -109,7 +127,7 @@ const imageView = Ti.UI.createImageView({
 })
 ```
 
-Note the use of the `~` alias which automatically resolves to the `app/assets` folder of your project. Webpack will now make sure to copy that file to your app and replace the require with the path pointing to the image withing your app.
+Note the use of the `~` alias which automatically resolves to the `app/assets` folder of your project. Webpack will now make sure to copy that file to your app and replace the require with the path pointing to the image within your app.
 
 The main benefit of this is that you can chain more loaders into this process and, for example, automatically compress all used images by default to minify the size of your final App bundle.
 
@@ -155,7 +173,7 @@ export const msg = 'This is used on Android'
 
 If no file with a platform suffix was found Webpack tries to resolve the file as usual without any suffix.
 
-## Classic
+## Migrate Classic Project
 
 Migrating a classic project is pretty straight forward. All you need to do is to move your existing files into a new `app` directory in your project root.
 
@@ -167,7 +185,7 @@ Webpack will then process and bundle all your JS files and assets and put them b
 
 > 💡 **TIP:** Add the `Resources` folder to your `.gitignore` since it will be created by Webpack now and should be considered as an intermediate build folder.
 
-## Alloy
+## Migrate Alloy Project
 
 ### Install dependencies
 
@@ -177,28 +195,115 @@ When using Webpack and Alloy together you need to install `alloy` and `alloy-com
 npm i alloy alloy-compiler -D
 ```
 
-This allows you to choose the `alloy` version on a per project level.
+This allows you to choose the `alloy` version per project.
 
 ### Remove old Alloy plugin
 
 Since Webpack now compiles your Alloy app the default Alloy plugin is not required anymore. You can safely delete `plugins/ti.alloy` and remove it from the `plugins` section of your `tiapp.xml`.
 
+### Create required folders
+
+Webpack requires that your project includes all possible Alloy sub-folders, even if they are empty. This is due to the way Webpack resolves dynamic requires and it needs to scan folders like `app/controllers` or `app/widgets`. Make sure your project structure looks like this and create folders if neccessary:
+
+```
+app/
+├── assets/
+├── controllers/
+├── i18n/
+├── lib/
+├── models/
+├── platform/
+├── styles/
+├── views/
+├── widgets/
+├── alloy.js
+└── config.json
+```
+
+### No automatic processing of assets/lib/vendors folders
+
+When you are migrating from an Alloy app without Webpack, you are probably used to the fact all content from the following directories is copied to your app:
+
+- `app/assets`
+- `app/lib`
+- `app/vendor`
+
+This is only true for `app/assets` by default when you are using Webpack. All files from this directory will be copied directly into your app as-is. Source files in `app/lib` will be bundled by Webpack into a _single_ output file.
+
+Usage of the `app/lib` directory is discuraged with Webpack. It is recommended to install all your third-party libraries as Node modules and let Webpack process them from there.
+
 ### Code changes
 
 In addition to the changes described in the [general guidelines](#general-guidelines) above, there are a couple of Alloy specific changes that your need to apply to your project.
 
-- Requires in widgets need to use `@widget` instead of `WPATH`: `require(WPATH('utils'))` → `require('@widget/utils')`
-- Models **need** to use ES6 `export`. To migrate, symply change `exports.definition =` → `export const definition =`
-- Make sure your are **not** using a leading slash when creating controllers. `Alloy.createController('/intro')` → `Alloy.createController('intro')`
+#### Replace `WPATH` with `@widget`
 
-If you specifiy a custom module on a view, remember that the same Webpack require rules apply here as well. Supposed you have a custom `TabbedBar` implementation in `app/libs/TabbedBar.js`, see the following example how to refer to it. Note the use of the `@` alias.
+Requires in widgets need to use `@widget` instead of `WPATH`
+
+```js
+// without webpack
+require(WPATH('utils'))
+
+// with webpack
+require('~widget/utils')
+```
+
+#### Use ES6 `export` in Models
+
+Models **need** to use ES6 `export`. To migrate, symply change `exports.definition =` to `export const definition =`.
+
+```js
+// without webpack
+exports.definition = {
+  config: {
+    // ...
+  }
+}
+
+// with webpack
+export const definition = {
+  config: {
+    // ...
+  }
+}
+```
+
+#### Creating controllers
+
+Make sure your are **not** using a leading slash when creating controllers.
+
+```js
+// wihtout webpack
+Alloy.createController('/index')
+
+// with webpack
+Alloy.createController('index')
+```
+
+#### Custom `module` attribute in Views
+
+If you specifiy a custom module on a view, remember that the same Webpack require rules apply here as well. Supposed you have a custom `TabbedBar` implementation in `app/libs/TabbedBar.js`, see the following example how to refer to it. Note the use of the `@` alias, which points to `app/lib` in Alloy apps.
 
 ```xml
 <Alloy>
-  <TabbedBar module="@/TabbedBar">
-  </TabbedBar>
+  <TabbedBar module="@/TabbedBar"></TabbedBar>
 </Alloy>
 ```
+
+### Notes
+
+A few use cases from the original Alloy build are not supported yet when using Webpack. There are also some gotchas when you are coming from a legacy Alloy project that you need to be aware of when migrating your Alloy app to Webpack.
+
+- Place **all** your JS source code that needs to be bundled by Webpack in `app/lib`. Remember that Webpack will only bundle your JS files when your actually `require`/ `import` them. They will **not** automatically be copied into the app.
+- Only the `app/assets` folder will be copied to your app directly. The same applies to widget's `assets` directory.
+- JavaScript files in `app/assets` will be copied as-is and will not be transpiled via Babel. Keep this in mind when you are trying to use them in a WebView, for example.
+- The `app/vendor` directory is ignored by Webpack and will not be copied to your app. Use NPM packages to bundle your third-party dependencies with Webpack, or move existing source code to `app/lib` if you can't rely on NPM packages for a specific dependency.
+
+### Known limitations
+
+- No support for Alloy JS makefiles (JMK).
+- No support for `DefaultIcon.png` from themes.
+- Views always need to have a matching file in `controllers`. The controller file can be empty, but it needs to be there for Webpack to properly discover the component.
 
 ## Webpack Configuration
 
@@ -206,9 +311,11 @@ Titanium comes with pre-defined Webpack configurations to get you started quickl
 
 ### Hook into webpack-chain
 
-To change the Webpack configuration you need to create a new hook file under `hooks`. This hook file needs to export a function which will receive a [Hook API](./hook-api/README.md) object and some genral project options. Using the Hook API you can tap into the Webpack configuration.
+To change the Webpack configuration you need to create a new plugin file somewhere in your project. This plugin file needs to export a function which will receive a [Plugin API](./hook-api/README.md) object and some genral project options. Using the Plugin API you can tap into the Webpack configuration.
 
 ```js
+// <project-root>/my-plugin.js
+
 module.exports = (api, options) => {
   api.chainWebpack(config => {
     // modify config here
@@ -216,21 +323,21 @@ module.exports = (api, options) => {
 }
 ```
 
-After you have created the file you need to activate the hook in your `package.json`.
+After you have created the plugin file you need to activate it in your `package.json`.
 
 ```json
 {
-  "appcdHooks": [
-    "hooks/my-hook.js"
+  "appcdWebpackPlugins": [
+    "my-plugin.js"
   ]
 }
 ```
 
-> 💡 **TIP:** The Webpack plugin will automatically watch your hooks for changes and restarts the Webpack build task to properly load updated config values.
+> 💡 **TIP:** The Webpack service will automatically watch local plugins for changes and restarts the Webpack build task to properly load updated config values.
 
 ### Examples
 
-Also take a look the extensive list of [examples from webpack-chain](https://github.com/neutrinojs/webpack-chain#getting-started) to see what else you can do with the `config` object.
+The follwing examples demonstrate how to use the `chainWebpack` function to modify the Webpack configuration. Also take a look the extensive list of [examples from webpack-chain](https://github.com/neutrinojs/webpack-chain#getting-started) to see what else you can do with the `config` object.
 
 #### Add alias
 
@@ -239,7 +346,7 @@ module.exports = (api, options) => {
   api.chainWebpack(config => {
     config.resolve
       .alias
-        .set('@u', api.resolve('app', 'src', 'utils'));
+        .set('~utils', api.resolve('app', 'src', 'utils'));
   });
 }
 ```
@@ -262,6 +369,8 @@ module.exports = (api, options) => {
 ```
 
 #### Delete plugin
+
+Delete a named plugin from the configuration. Refer to the bundled [configuration files](./src/config) to see what named plugins are configured.
 
 ```js
 module.exports = (api, options) => {
