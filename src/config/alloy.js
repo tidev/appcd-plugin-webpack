@@ -122,8 +122,7 @@ module.exports = function (api, options) {
 		config.plugin('alloy-loader')
 			.use(require.resolve('alloy-loader/lib/plugin'), [
 				{
-					compiler: alloyCompiler,
-					platform: build.platform
+					compiler: alloyCompiler
 				}
 			]);
 
