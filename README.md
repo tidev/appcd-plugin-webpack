@@ -9,7 +9,7 @@ Appcd plugin to manage Webpack build tasks.
 Install the Webpack plugin globally. Appcd will automatically detect the new plugin and start it on demand.
 
 ```bash
-npm i @appcd/plugin-webpack -f
+npm i @appcd/plugin-webpack -g
 ```
 
 ## Endpoints
