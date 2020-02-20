@@ -2,6 +2,16 @@
 
 Appcd plugin to manage Webpack build tasks.
 
+> 💡 Refer to the [migration guide](./migration.md) for instruction how to enable Webpack in your existing Titanium projects.
+
+## Getting started
+
+Install the Webpack plugin globally. Appcd will automatically detect the new plugin and start it on demand.
+
+```bash
+npm i @appcd/plugin-webpack -g
+```
+
 ## Endpoints
 
 This plugin registers the following endpoints:
