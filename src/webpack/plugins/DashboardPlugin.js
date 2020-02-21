@@ -113,8 +113,7 @@ export class DashboardPlugin extends ProgressPlugin {
 				data: {
 					progress: this.state.progress,
 					message: this.state.message,
-					details1: this.state.details1,
-					details2: this.state.details2,
+					details: this.state.details,
 					request: this.state.request ? formatRequest(this.state.request) : ''
 				}
 			});
