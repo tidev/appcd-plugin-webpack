@@ -61,14 +61,6 @@ module.exports = {
     '@nuxtjs/axios',
     '@nuxtjs/proxy'
   ],
-  apollo: {
-    clientConfigs: {
-      default: {
-        httpEndpoint: 'http://localhost:4000',
-        wsEndpoint: 'ws://localhost:4000'
-      }
-    }
-  },
   /*
    ** Axios module configuration
    ** See https://axios.nuxtjs.org/options
