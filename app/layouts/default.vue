@@ -3,7 +3,7 @@
     <v-app-bar fixed app clipped-left color="#0e1f25" dark>
       <v-toolbar-title>
         <nuxt-link to="/" class="d-flex title-link">
-          <img src="@/assets/axway-logo.png" height="30" class="pr-3" />
+          <img src="~/assets/axway-logo.png" height="30" class="pr-3" />
           <span>Appcd Dashboard</span>
         </nuxt-link>
       </v-toolbar-title>

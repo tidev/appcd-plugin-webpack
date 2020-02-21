@@ -5,7 +5,7 @@
         <dashboard-card>
           <v-card-text>
             <div class="text-center py-6">
-              <img src="@/assets/axway-logo.png" class="intro-logo" />
+              <img src="~/assets/axway-logo.png" class="intro-logo" />
             </div>
             <p class="headline text-center">
               Welcome to the Axway Appcelerator Daemon dashboard.
