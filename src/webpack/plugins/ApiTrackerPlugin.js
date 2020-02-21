@@ -79,6 +79,7 @@ export class ApiTrackerPlugin {
 				throw new TypeError('Unsupported value in "exclude" option.');
 			}
 		});
+		// eslint-disable-next-line security/detect-non-literal-regexp
 		return excludes.length ? new RegExp(excludes.join('|')) : null;
 	}
 

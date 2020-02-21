@@ -28,6 +28,7 @@ export function generateTranspileDepRegex(transpileDependencies) {
 			throw new Error('Unsupported value in "transpileDependencies" option.');
 		}
 	});
+	// eslint-disable-next-line security/detect-non-literal-regexp
 	return deps.length ? new RegExp(deps.join('|')) : null;
 }
 
