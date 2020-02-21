@@ -21,16 +21,16 @@ export default class JobService extends Dispatcher {
 
 	async startWebpack(ctx) {
 		const { params, data: options } = ctx.request;
-		const jobIdentifier = (options && options.identifier) || params.identifier;
+		const jobIdentifier = params.identifier;
 		let job;
-		if (this.jobManager.hasJob(jobIdentifier)) {
+		if (jobIdentifier && this.jobManager.hasJob(jobIdentifier)) {
 			job = this.jobManager.getJob(jobIdentifier);
 			await job.stop();
 			if (options) {
 				job.options = options;
 			}
 		} else if (options) {
-			job = new BuildJob(jobIdentifier, options, this.config);
+			job = new BuildJob(options, this.config);
 			this.jobManager.addJob(job);
 		} else {
 			ctx.response = new AppcdError('Invalid request data');

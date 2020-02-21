@@ -41,15 +41,15 @@ export default class BuildJob extends EventEmitter {
 	/**
 	 * Constructs a new build job.
 	 *
-	 * @param {string} id Unique job identifier
 	 * @param {object} options Options for this job.
 	 * @param {object} config Plugin config.
 	 */
-	constructor(id, options, config) {
+	constructor(options, config) {
 		super();
 
+		this.options = options;
+		this.id = options.identifier;
 		this._state = BuildJob.STATE_STOPPED;
-		this.id = id;
 		this.pid = null;
 		this.output = '';
 		this.history = [];
@@ -58,7 +58,6 @@ export default class BuildJob extends EventEmitter {
 			progress: 0
 		};
 		this.tiSymbols = {};
-		this.options = options;
 		this.inactivityTimeout = null;
 
 		const inactivityTimeout = config.inactivityTimeout;
@@ -99,6 +98,8 @@ export default class BuildJob extends EventEmitter {
 
 	/**
 	 * Webpack is currently building.
+	 *
+	 * @type {string}
 	 */
 	static get STATE_BUILDING() {
 		return 'building';
@@ -109,6 +110,8 @@ export default class BuildJob extends EventEmitter {
 	 *
 	 * If `watch` mode is enabled it is watching for changes and will
 	 * automatically start a new compilation.
+	 *
+	 * @type {string}
 	 */
 	static get STATE_READY() {
 		return 'ready';
@@ -116,18 +119,27 @@ export default class BuildJob extends EventEmitter {
 
 	/**
 	 * The Webpack task was stopped.
+	 *
+	 * @type {string}
 	 */
 	static get STATE_STOPPED() {
 		return 'stopped';
 	}
 
 	/**
-	 * The Webpack task existed with an error.
+	 * The Webpack task exited with an error.
+	 *
+	 * @type {string}
 	 */
 	static get STATE_ERROR() {
 		return 'error';
 	}
 
+	/**
+	 * The current state of this build job.
+	 *
+	 * @type {string}
+	 */
 	get state() {
 		return this._state;
 	}
