@@ -1611,10 +1611,10 @@ ajv@^6.1.0, ajv@^6.10.0, ajv@^6.10.2, ajv@^6.5.5:
     json-schema-traverse "^0.4.1"
     uri-js "^4.2.2"
 
-alloy-loader@^0.2.1:
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/alloy-loader/-/alloy-loader-0.2.1.tgz#fbe33f5c0b2ac152e00100a52a86606271b5abda"
-  integrity sha512-lV4u6CbpQfpUGhRb9t6bkXMtls+a2xgbPqKXuE2oG4GjvsqJsE/EfaQ9SXZ2ek3MabngbmEoe4FyyybZ53KUKw==
+alloy-loader@^0.2.3:
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/alloy-loader/-/alloy-loader-0.2.3.tgz#8442f1fb3269651fdbe2ebc384ec79d2c8e76cd5"
+  integrity sha512-0Gh2v5McXOfK4hS/0oslygkhoD6SZnKS+GizJGqiL1x+wnnQQTR3lHU0h0qs/YenaLRe1qOCEGAiJDR0Nax+oQ==
   dependencies:
     globby "^11.0.0"
     loader-utils "^1.2.3"
