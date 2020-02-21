@@ -91,6 +91,10 @@
     "appcdVersion": "^3.2.0",
     "inactivityTimeout": 600000,
     "name": "webpack",
-    "type": "external"
+    "type": "external",
+    "config": "./config/config.js"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

@@ -38,7 +38,14 @@ const jsonTemplateConfig = {
  * Uses webpack's NodeJS api to run a webpack compilation
  */
 export default class BuildJob extends EventEmitter {
-	constructor(id, options) {
+	/**
+	 * Constructs a new build job.
+	 *
+	 * @param {string} id Unique job identifier
+	 * @param {object} options Options for this job.
+	 * @param {object} config Plugin config.
+	 */
+	constructor(id, options, config) {
 		super();
 
 		this._state = BuildJob.STATE_STOPPED;
@@ -52,6 +59,21 @@ export default class BuildJob extends EventEmitter {
 		};
 		this.tiSymbols = {};
 		this.options = options;
+		this.inactivityTimeout = null;
+
+		const inactivityTimeout = config.inactivityTimeout;
+		this.on('state', state => {
+			if (this.inactivityTimeout !== null) {
+				clearTimeout(this.inactivityTimeout);
+			}
+			if (state === BuildJob.STATE_STOPPED) {
+				return;
+			}
+			this.inactivityTimeout = setTimeout(() => {
+				this.writeOutput(`No activity within the last ${inactivityTimeout}ms, stopping Webpack task.`);
+				this.stop();
+			}, inactivityTimeout);
+		});
 
 		if (this.options.watch) {
 			const pluginContext = pluginService.createPluginContext(this.projectPath, this.options);
@@ -210,16 +232,19 @@ export default class BuildJob extends EventEmitter {
 
 	/**
 	 * Stops the Webpack build task.
-	 *
-	 * Note that we don't set the state here as it will be set when the child
-	 * process' `exit` event is received. This will trigger a state change here
-	 * which we use to resolve the returned promise.
 	 */
 	async stop() {
 		if (typeof this.pid !== 'number') {
+			this.state = BuildJob.STATE_STOPPED;
+			this.cleanupJobData();
 			return;
 		}
 
+		/**
+		 * Note that we don't set the state here as it will be set when the child
+		 * process' `exit` event is received. This will trigger a state change here
+		 * which we use to resolve the returned promise.
+		 */
 		return new Promise((resolve, reject) => {
 			const killTimeout = setTimeout(() => {
 				this.off('state', handler);

@@ -12,7 +12,8 @@ export default class JobService extends Dispatcher {
 		this.jobManager = jobManager;
 	}
 
-	activate() {
+	activate(config) {
+		this.config = config.webpack;
 		this.register('/start/:identifier?', ctx => this.startWebpack(ctx));
 		this.register('/stop/:identifier', ctx => this.stopWebpack(ctx));
 		this.register('/list', ctx => this.listBuildJobs(ctx));
@@ -29,7 +30,7 @@ export default class JobService extends Dispatcher {
 				job.options = options;
 			}
 		} else if (options) {
-			job = new BuildJob(jobIdentifier, options);
+			job = new BuildJob(jobIdentifier, options, this.config);
 			this.jobManager.addJob(job);
 		} else {
 			ctx.response = new AppcdError('Invalid request data');
