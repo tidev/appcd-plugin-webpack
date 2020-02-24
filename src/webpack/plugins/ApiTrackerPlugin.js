@@ -6,7 +6,7 @@ import { isWindows, parseRequest } from '../../utils';
 export class ApiTrackerPlugin {
 	constructor(options) {
 		this.excludePattern = this.generateExcludePattern((options && options.exclude) || []);
-		this.tiNodeRegExp = /^Ti(tanium)?/;
+		this.tiNodeRegExp = /^Ti(tanium)?\./;
 		this.cwd = options.cwd;
 		this.watchRun = false;
 		this.changedModules = [];
