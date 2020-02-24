@@ -61,7 +61,7 @@ export default class BuildJob extends EventEmitter {
 		this.inactivityTimeout = null;
 
 		const inactivityTimeout = config.inactivityTimeout;
-		this.on('state', state => {
+		this.on('state', (job, state) => {
 			if (this.inactivityTimeout !== null) {
 				clearTimeout(this.inactivityTimeout);
 			}
