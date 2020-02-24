@@ -56,7 +56,6 @@ module.exports = {
    ** Nuxt.js runtime modules
    */
   modules: [
-    // '@nuxtjs/apollo',
     // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/axios',
     '@nuxtjs/proxy'
@@ -65,7 +64,9 @@ module.exports = {
    ** Axios module configuration
    ** See https://axios.nuxtjs.org/options
    */
-  axios: {},
+  axios: {
+    proxy: true
+  },
   proxy: {
     '/appcd': {
       target: 'http://localhost:1732',

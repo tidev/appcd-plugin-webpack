@@ -20,7 +20,7 @@ export async function activate(config) {
 
 	appcd.register('/status', statusService);
 
-	uiService.activate();
+	uiService.activate(config);
 	appcd.register('/web', uiService);
 
 	jobService.activate(config);

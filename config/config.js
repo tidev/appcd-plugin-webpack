@@ -12,6 +12,19 @@ module.exports = {
 		 *
 		 * @type {number}
 		 */
-		inactivityTimeout: 600000
+		inactivityTimeout: 600000,
+		/**
+		 * Web UI config
+		 *
+		 * @type {object}
+		 */
+		ui: {
+			/**
+			 * Port the Web UI will listen on
+			 *
+			 * @type {number}
+			 */
+			port: 8084
+		}
 	}
 };
