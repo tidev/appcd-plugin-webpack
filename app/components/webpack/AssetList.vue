@@ -4,7 +4,7 @@
     <v-card-text class="pa-0">
       <stats-loading v-if="!assets.length" />
       <v-list v-else dense height="210">
-        <v-list-item v-for="asset in assets" :key="asset.name">
+        <v-list-item v-for="asset in items" :key="asset.name">
           <v-list-item-icon>
             <v-icon
               class="primary--text"
@@ -23,6 +23,7 @@
             <v-progress-linear :value="asset.ratio * 100"></v-progress-linear>
           </v-list-item-action>
         </v-list-item>
+        <div v-intersect.quiet="showMore"></div>
       </v-list>
     </v-card-text>
   </dashboard-card>
@@ -41,8 +42,14 @@ export default {
   filters: {
     size
   },
+  data: () => ({
+    maxAssets: 20
+  }),
   computed: {
-    ...mapGetters('webpack', ['assets'])
+    ...mapGetters('webpack', ['assets']),
+    items() {
+      return this.assets.slice(0, Math.min(this.maxAssets, this.assets.length))
+    }
   },
   methods: {
     getTypeIcon(fileName) {
@@ -74,6 +81,9 @@ export default {
         default:
           return '$fileQuestion'
       }
+    },
+    showMore(entries, observer) {
+      this.maxAssets += 20
     }
   }
 }
