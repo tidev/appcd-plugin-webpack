@@ -1,61 +1,73 @@
-import path from 'path';
+import generateOptions from './fixtures/options';
+import config from '../config/config';
+import BuildJob from '../dist/job/build-job';
+import JobManager from '../dist/job/manager';
 
-import WebpackJob from '../dist/WebpackJob';
-import WebpackJobManager from '../dist/WebpackJobManager';
+let options = generateOptions('classic');
+let identifier = options.identifier;
 
-let jobIdentifier = 'test';
-let jobOptions = {
-	identifier: jobIdentifier,
-	projectPath: path.resolve(__dirname, '..'),
-	configPath: path.resolve(__dirname, 'fixtures', 'webpack.config.js')
-};
+function createJob() {
+	return new BuildJob(options, config);
+}
 
-describe('WebpackJobManager', () => {
+describe('JobManager', () => {
 	let jobManager;
 
 	beforeEach(() => {
-		jobManager = new WebpackJobManager();
+		jobManager = new JobManager();
 	});
 
 	afterEach(() => {
 		jobManager = null;
 	});
 
+	describe('addJob', () => {
+		it('should add job', () => {
+			expect(jobManager.hasJob(identifier)).to.be.false;
+			const job = createJob();
+			jobManager.addJob(job);
+			expect(jobManager.jobs.has(identifier)).to.be.true;
+		});
+
+		it('should emit "added" event', done => {
+			jobManager.once('added', (addedJob) => {
+				expect(addedJob).to.equal(job);
+				done();
+			});
+			const job = createJob();
+			jobManager.addJob(job);
+		});
+
+		it('should delegate "state" event for added jobs', done => {
+			jobManager.once('state', (_job, state) => {
+				expect(_job).to.equal(job);
+				expect(state).to.equal(BuildJob.STATE_ERROR);
+				done();
+			});
+			const job = createJob();
+			jobManager.addJob(job);
+			job.state = BuildJob.STATE_ERROR;
+		});
+	});
+
 	describe('hasJob', () => {
 		it('should return wether a job exists or not', () => {
-			expect(jobManager.hasJob(jobIdentifier)).to.be.false;
-			const job = new WebpackJob({
-				identifier: jobIdentifier
-			});
-			jobManager.jobs.set(jobIdentifier, job);
-			expect(jobManager.hasJob(jobIdentifier)).to.be.true;
+			expect(jobManager.hasJob(identifier)).to.be.false;
+			const job = createJob();
+			jobManager.addJob(job);
+			expect(jobManager.hasJob(identifier)).to.be.true;
 		});
 	});
 
 	describe('getJob', () => {
 		it('should return job by identifier', () => {
-			const job = new WebpackJob({
-				identifier: jobIdentifier
-			});
-			jobManager.jobs.set(jobIdentifier, job);
-			expect(jobManager.getJob(jobIdentifier)).to.be.equal(job);
+			const job = createJob();
+			jobManager.addJob(job);
+			expect(jobManager.getJob(identifier)).to.be.equal(job);
 		});
 
 		it('should return undefined for unknown job identifier', () => {
 			expect(jobManager.getJob('webpack')).to.be.undefined;
 		});
 	});
-
-	it('should start and stop webpack build job', async () => {
-		const jobManager = new WebpackJobManager();
-		const job = new WebpackJob(jobOptions);
-		await jobManager.addAndStartJob(job);
-
-		expect(jobManager.hasJob(job.id)).to.be.true;
-		expect(job.state).to.not.equal(WebpackJob.STATE_ERROR);
-
-		await jobManager.stopJob(job);
-		expect(job.state).to.be.equal(WebpackJob.STATE_STOPPED);
-	});
-
 });

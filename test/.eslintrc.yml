@@ -1,4 +1,4 @@
 extends:
-  - "axway/env-node"
+  - "../.eslintrc"
   - "axway/+mocha"
   - "axway/+chai"
