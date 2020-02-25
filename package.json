@@ -4,14 +4,14 @@
   "description": "Manage Webpack builds with the Appc Daemon",
   "main": "./dist/index.js",
   "scripts": {
-    "app:build": "cross-env NODE_OPTIONS=--max-old-space-size=4096 nuxt build",
+    "app:build": "cross-env NODE_OPTIONS=--max-old-space-size=4096 nuxt build -c app/nuxt.config.js --generate=false",
     "app:dev": "cross-env NODE_ENV=development NODE_OPTIONS=--max-old-space-size=4096 nodemon app/server/index.js --watch app/server --watch app/nuxt.config.js",
     "app:lint": "eslint --ext .js,.vue --ignore-path .gitignore app",
     "build": "gulp build",
     "coverage": "gulp coverage",
     "dev": "gulp watch",
     "docs": "gulp docs",
-    "prepare": "gulp build",
+    "prepare": "gulp build && yarn run app:build",
     "test": "gulp test"
   },
   "keywords": [
