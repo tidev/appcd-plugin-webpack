@@ -1,4 +1,5 @@
 {
+	"root": true,
 	"extends": [ "axway/env-node", "axway/+babel" ],
 	"globals": {
 		"appcd": "readonly"
