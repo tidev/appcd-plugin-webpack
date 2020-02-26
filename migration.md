@@ -80,42 +80,66 @@ When bundling code with Webpack there are a few rules you need to follow in your
 
 #### Dynamic requires
 
-Dynamic requires with expressions need to be adopted to work well with webpack. See [require with expression](https://webpack.js.org/guides/dependency-management/#require-with-expression) from Webpack docs for more details.
-
-#### Titanium non-spec require
-
-The Titanium `require` implementation has a non-spec fallback to resolve non-relative requires from the app root. This is not supported when using Webpack and you need to adjust your require expressions accordingly.
-
 ```js
-// Unsupported require to `app/lib/my-local-module.js` in an Alloy app
-require('my-local-module')
-
-// How it should be with Webpack
-require('../my-local-module')
+import locale from `date-fns/locales/${locale}.js`
 ```
 
-See the following section about aliases how you can avoid writing overly long relative imports.
+Dynamic requires with expressions need to be adopted to work well with webpack. See [require with expression](https://webpack.js.org/guides/dependency-management/#require-with-expression) from Webpack docs for more details.
+
+A few general rules you should follow:
+
+- Have at least one static part in your expression.
+- Always add a file extension to avoid inclusion of unrelated file types.
+
+#### Absolute paths
+
+```js
+import '/home/me/file';
+```
+
+The behavior of absolute requires is different when using Webpack. When you build an app with Webpack, requires are resolved at build time on your local machine, not from the root directory of your final app bundle. Use the `@/` [alias](#aliases) to refer to the source root directory of your project.
+
+#### Module paths
+
+```js
+import 'module';
+import 'module/lib/file';
+```
+
+Modules are searched for inside the `node_modules` folder in your project.
+
+To support the non-spec behavior of the Titanium `require` implementation to look for modules in the app root directory as well, the following folders will also be searched to maintain backwards compaibility:
+
+- Classic: `src`
+- Alloy: `app/lib` and `app/vendor`
+
+Note that the folders are searched in order and the first match wins. Make sure to not have possible duplicates to avoid unexpected module resolution.
+
+> ⚠️ **WARNING:** Using a module style request to require your own source files is strongly discuraged when using Webpack. Support for this may be removed in future versions. Always use relative imports or make use of aliases.
 
 ### Aliases
 
-To make your life easier when dealing with relative requires throughout your project you can use two pre-configured aliases.
+To make your life easier when dealing with relative imports throughout your project there are two pre-defined aliases.
 
-- `@`: projects source directory. This resolves differently depending on what project type you are using.
-  - **Classic**: `app/src`
+- `@`: project source directory
+  - **Classic**: `src`
   - **Alloy**: `app/lib`
-  - **Vue.js**: `app/src`
-  - **Angular**: `app/src`
-- `~`: project's asset directory, always `app/assets`
+  - **Vue.js**: `src`
+  - **Angular**: `src`
 
-There might be other pre-configured aliases available depending on the project type. You can also add your own aliases.
+- `~`: project non-code assets directory
+  - **Classic**: `src/assets`
+  - **Alloy**: `app/assets`
+  - **Vue.js**: `src/assets`
+  - **Angular**: `src/assets`
 
-### Using NPM packages
+### Using NPM modules
 
-You can install NPM packages directly into your project root directory and require them in your Titanium code. Webpack then takes care of the rest and makes sure to properly resolve and bundle them into your app.
+You can install NPM modules directly into your project root directory and require them in your Titanium code. Webpack then takes care of the rest and makes sure to properly resolve and bundle them into your app.
 
-### Asset management
+### Advanced: Asset management
 
-For easier transitioning Webpack copies all assets from `app/assets` to your app for Classic and Alloy projects by default. However, since [file-loader](https://github.com/webpack-contrib/file-loader) is also pre-configured you can make use of it if you'd like and disable the legacy copying of all asset.
+For a simplified migration process, Webpack copies all assets from `src/assets` (Classic) or `app/assets` (Alloy) to your app by default. However, since [file-loader](https://github.com/webpack-contrib/file-loader) is already pre-configured you can make use of it if you'd like and disable the legacy copying of all asset. The main benefit of this is that you can chain more loaders into this process and, for example, automatically compress all used images by default to minify the size of your final App bundle.
 
 For example, let's assume you have an image view defined like this:
 
@@ -125,7 +149,7 @@ Ti.UI.createImageView({
 })
 ```
 
-To use the `file-loader` you simply need to `require` the image:
+To use `file-loader` you simply need to `require` the image:
 
 ```js
 const imageView = Ti.UI.createImageView({
@@ -133,16 +157,14 @@ const imageView = Ti.UI.createImageView({
 })
 ```
 
-Note the use of the `~` alias which automatically resolves to the `app/assets` folder of your project. Webpack will now make sure to copy that file to your app and replace the require with the path pointing to the image within your app.
+Note the use of the `~` alias which automatically resolves to the assets folder of your project. Webpack will now make sure to copy that file to your app and replace the require with the path pointing to the image within your app.
 
-The main benefit of this is that you can chain more loaders into this process and, for example, automatically compress all used images by default to minify the size of your final App bundle.
+Once you have changed all references to assets in your app with `require`/`import` you can disable the automatic copying of all assets by disabling the pre-configured `copy-assets` plugin. See the [delete plugin](#delete-plugin) example below in the [Webpack Configuration](#webpack-configuration) section how to do that.
 
-Once you have changed all references to assets in your app with `require` you can disable the automatic copying of all assets by disabling the pre-configured `copy-assets` plugin. See the [delete plugin](#delete-plugin) example below in the [Webpack Configuration](#webpack-configuration) section how to do that.
-
-> 💡 **TIP:** Make sure to require *all assets* you want in your app. To copy fonts, for example, include requires to the font files.
+> 💡 **TIP:** Make sure to require *all assets* you want in your app. To copy fonts, for example, import the font files.
 >
 > ```js
-> require('~/FontAwesome.otf')
+> import '~/fonts/FontAwesome.otf'
 > ```
 
 ### Platform specific files
@@ -226,7 +248,7 @@ app/
 └── config.json
 ```
 
-### No automatic processing of assets/lib/vendors folders
+### No automatic processing of assets/lib/vendor folders
 
 When you are migrating from an Alloy app without Webpack, you are probably used to the fact all content from the following directories is copied to your app:
 
@@ -234,9 +256,9 @@ When you are migrating from an Alloy app without Webpack, you are probably used 
 - `app/lib`
 - `app/vendor`
 
-This is only true for `app/assets` by default when you are using Webpack. All files from this directory will be copied directly into your app as-is. Source files in `app/lib` will be bundled by Webpack into a _single_ output file.
+This is only true for `app/assets` by default when you are using Webpack. All files from this directory will be copied directly into your app as-is. Source files in `app/lib` that you `require`/`import` will be bundled by Webpack into a _single_ output file.
 
-Usage of the `app/lib` directory is discuraged with Webpack. It is recommended to install all your third-party libraries as Node modules and let Webpack process them from there.
+Usage of the `app/vendor` directory is discuraged with Webpack. It is recommended to install all your third-party libraries as Node modules and let Webpack process them from there.
 
 ### Code changes
 
