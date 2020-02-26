@@ -12,7 +12,7 @@ Switching to the Webpack build enables some great improvemnts:
 
 - Pre-configured for your Titanium project, no need to deal with Webpack configuration files to get you up and running.
 - Highly customizable via a simple plugin API, which allows you to hook into the Webpack configuration with [webpack-chain](https://github.com/neutrinojs/webpack-chain). Add new loaders and/or plugins to introduce new capabilites into your project.
-- Easily use your favorite module from NPM. Just install them into the project root.
+- Easily use your favorite modules from NPM. Just install them into the project root.
 - Significantly faster build times, especially for larger projects.
 - Web UI to view build results and analyze your app bundle assets.
 
@@ -24,7 +24,7 @@ Install the Webpack plugin globally. Appcd will automatically detect the new plu
 npm i @appcd/plugin-webpack -g
 ```
 
-## Configuration
+## Plugin Configuration
 
 You can change the global configuration settings for this plugin in `~/.appcelerator/appcd/config.json`. Have a look at the default [`config.js`](config/config.js) file to see what options are available. For example, to increase the activity timeout of Webpack build jobs to 20 minutes, add the following:
 
