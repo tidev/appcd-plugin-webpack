@@ -2,18 +2,6 @@
 
 This migration guides walks you though the steps you need to take to enable Webpack in your existing Titanium project.
 
-## Introduction
-
-By default Titanium uses Babel to transform your JavaScript code and run optimizations. This works great out of the box, however you have very little control over this process and can only customize it with Babel plugins. Also, while certainly possible, integrating new tooling into this pipeline via CLI hooks feels kind of "hacky", and in most cases is very specific to a single project. To address these issues, as well as building the proper foundation for upcoming Vue.js and Angular integration, we decided to introduce Webpack as an alternative build pipeline for all your app's assets.
-
-Switching to the Webpack build comes with some great improvemnts:
-
-- Pre-configured for your Titanium project, no need to deal with Webpack configuration files to get you up and running
-- Highly customizable via a powerfull plugin API, which allows you to hook into the Webpack configuration with [webpack-chain](https://github.com/neutrinojs/webpack-chain). Add new loaders and/or plugins to introduce new capabilites into your project.
-- Easily use your favorite module from NPM. Just install them into the project root.
-- Significantly faster build times, especially for larger projects
-- Web UI to view build results and analyze your app bundle assets.
-
 ## Getting started
 
 First make sure you have at least version 3.2.0+ of [appc-daemon](https://github.com/appcelerator/appc-daemon) installed. The Appcelerator Daemon (or appcd for short) powers our Webpack build pipeline and manages all Webpack builds in the background.
