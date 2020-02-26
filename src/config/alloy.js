@@ -161,11 +161,19 @@ module.exports = function (api, options) {
 					{ from: `platform/${build.platform}`, to: `../platform/${build.platform}` }
 				]
 			]);
+		const platformExclude = {
+			android: 'ios',
+			ios: 'android'
+		};
 		config.plugin('copy-assets')
 			.use(CopyPlugin, [
 				[
 					// copy app/assets
-					{ from: 'assets', to: '.' }
+					{
+						from: 'assets',
+						to: '.',
+						ignore: [ `${platformExclude[build.platform]}/**/*` ]
+					}
 				]
 			]);
 
@@ -175,7 +183,8 @@ module.exports = function (api, options) {
 			if (fs.existsSync(widgetAssetPath)) {
 				copyWidgetAssetsOptions.push({
 					from: path.join(widget.dir, 'assets'),
-					to: `./${widget.manifest.id}/`
+					to: `./${widget.manifest.id}/`,
+					ignore: [ `${platformExclude[build.platform]}/**/*` ]
 				});
 			}
 		});
