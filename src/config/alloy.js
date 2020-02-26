@@ -69,7 +69,11 @@ module.exports = function (api, options) {
 				.set('/alloy', path.join(alloyRoot, 'lib', 'alloy'))
 				.end()
 			.extensions
-				.merge([ '.xml', '.tss' ]);
+				.merge([ '.xml', '.tss' ])
+				.end()
+			.modules
+				.add(api.resolve('app', 'lib'))
+				.add(api.resolve('app', 'vendor'));
 
 		// module rules ------------------------------------------------------------
 
