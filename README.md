@@ -30,7 +30,7 @@ You can change the global configuration settings for this plugin in `~/.appceler
 
 ```json
 {
-    "webpack" {
+    "webpack": {
         "inactivityTimeout": 1200000
     }
 }
