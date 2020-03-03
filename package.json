@@ -45,6 +45,7 @@
     "lodash.transform": "^4.6.0",
     "node-titanium-sdk": "^5.1.0",
     "nuxt": "^2.11.0",
+    "portfinder": "^1.0.25",
     "pretty-time": "^1.1.0",
     "read-pkg": "^5.2.0",
     "source-map": "^0.7.3",
@@ -54,6 +55,7 @@
     "v8-compile-cache": "^2.1.1",
     "webpack": "^4.43.0",
     "webpack-chain": "^6.4.0",
+    "webpack-dev-server": "^3.11.0",
     "webpack-target-titanium": "^2.1.0",
     "webpack-virtual-modules": "^0.2.1"
   },

@@ -212,7 +212,6 @@ export default class BuildJob extends EventEmitter {
 			taskName
 		];
 
-		const options = this.options;
 		this.output = `\u001b[90m$ appcd-plugin-webpack ${taskName} ${JSON.stringify(options)}\u001b[0m\n\n`;
 
 		const startTimeout = setTimeout(() => {
