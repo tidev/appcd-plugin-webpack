@@ -296,28 +296,6 @@ export const definition = {
 }
 ```
 
-#### Creating controllers
-
-Make sure your are **not** using a leading slash when creating controllers.
-
-```js
-// wihtout webpack
-Alloy.createController('/index')
-
-// with webpack
-Alloy.createController('index')
-```
-
-#### Custom `module` attribute in Views
-
-If you specifiy a custom module on a view, remember that the same Webpack require rules apply here as well. Supposed you have a custom `TabbedBar` implementation in `app/libs/TabbedBar.js`, see the following example how to refer to it. Note the use of the `@` alias, which points to `app/lib` in Alloy apps.
-
-```xml
-<Alloy>
-  <TabbedBar module="@/TabbedBar"></TabbedBar>
-</Alloy>
-```
-
 ### Notes
 
 A few use cases from the original Alloy build are not supported yet when using Webpack. There are also some gotchas when you are coming from a legacy Alloy project that you need to be aware of when migrating your Alloy app to Webpack.
