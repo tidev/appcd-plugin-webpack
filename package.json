@@ -49,7 +49,7 @@
     "lodash.defaultsdeep": "^4.6.1",
     "lodash.mapvalues": "^4.6.0",
     "lodash.transform": "^4.6.0",
-    "minimist": "^1.2.0",
+    "minimist": "^1.2.2",
     "node-titanium-sdk": "^4.2.0",
     "nuxt": "^2.11.0",
     "pretty-time": "^1.1.0",
