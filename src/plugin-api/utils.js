@@ -50,3 +50,14 @@ export function createPluginOptions(baseOptions) {
 
 	return options;
 }
+
+const pluginPattern = /^(@appcd\/|@titanium-sdk\/|@[\w]+\/appcd-|appcd-)webpack-plugin-/;
+
+export function isPlugin(id) {
+	return pluginPattern.test(id);
+}
+
+export function matchesPluginId(fullPluginId, id) {
+	const shortPluginId = fullPluginId.replace(pluginPattern, '');
+	return fullPluginId === id || shortPluginId === id;
+}

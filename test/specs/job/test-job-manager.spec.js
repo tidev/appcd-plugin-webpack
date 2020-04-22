@@ -1,7 +1,7 @@
-import generateOptions from './fixtures/options';
-import config from '../config/config';
-import BuildJob from '../dist/job/build-job';
-import JobManager from '../dist/job/manager';
+import generateOptions from '../../fixtures/options';
+import config from '../../../config/config';
+import BuildJob from '../../../dist/job/build-job';
+import JobManager from '../../../dist/job/manager';
 
 let options = generateOptions('classic');
 let identifier = options.identifier;
