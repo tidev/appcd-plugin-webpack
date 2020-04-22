@@ -1,7 +1,7 @@
-import generateOptions from './fixtures/options';
-import config from '../config/config';
+import generateOptions from '../../fixtures/options';
+import config from '../../../config/config';
 
-import BuildJob from '../dist/job/build-job';
+import BuildJob from '../../../dist/job/build-job';
 
 describe('BuildJob', () => {
 	it('should have initial stopped status', () => {

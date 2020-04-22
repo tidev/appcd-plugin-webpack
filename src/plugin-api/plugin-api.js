@@ -2,6 +2,7 @@ import fs from 'fs';
 import hash from 'hash-sum';
 import path from 'path';
 import Config from 'webpack-chain';
+import { matchesPluginId } from './utils';
 
 /** @typedef {import("./context").default} PluginContext */
 
@@ -91,7 +92,8 @@ export default class PluginApi {
 	 * @return {boolean}
 	 */
 	hasPlugin(id) {
-		return this.context.plugins.has(id);
+		return Array.from(this.context.plugins.keys())
+			.some(pid => matchesPluginId(pid, id));
 	}
 
 	/**

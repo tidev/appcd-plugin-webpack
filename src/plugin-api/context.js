@@ -5,6 +5,7 @@ import readPkg from 'read-pkg';
 
 import { loadModule } from './loader';
 import PluginApi from './plugin-api';
+import { isPlugin } from './utils';
 
 /**
  * The plugin context.
@@ -128,8 +129,21 @@ export default class PluginContext extends EventEmitter {
 			this.watchers.set(pkgPath, pkgWatcher);
 		}
 		const pkg = readPkg.sync({ cwd });
-		// TODO: Plugins from pkg.devDependencies and pkg.dependencies
 
+		// project plugins installed as dependencies
+		const projectPlugins = Object.keys(pkg.devDependencies || {})
+			.concat(Object.keys(pkg.dependencies || {}))
+			.filter(isPlugin)
+			.map(id => {
+				return {
+					id,
+					// eslint-disable-next-line security/detect-non-literal-require
+					apply: loadModule(id, cwd, true)
+				};
+			});
+		plugins = plugins.concat(projectPlugins);
+
+		// project local plugins configured in package.json
 		if (pkg.appcdWebpackPlugins) {
 			const files = pkg.appcdWebpackPlugins;
 			if (!Array.isArray(files)) {
