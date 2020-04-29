@@ -29,9 +29,14 @@ export default class PluginApi {
 		this.context = context;
 		context.hooks.forEach((hook, name) => {
 			if (this[name]) {
-				throw new Error(`Restricted hook name used. "${name}" is a pre-defined PluginApi method name.`);
+				throw new Error(`Restricted hook name used. "${name}" is a pre-defined PluginApi method.`);
 			}
-			this[name] = (value) => hook.add(value, id);
+			this[name] = (value, options) => {
+				if (!options.name) {
+					options.name = this.id;
+				}
+				hook.add(value, options);
+			};
 		});
 	}
 
