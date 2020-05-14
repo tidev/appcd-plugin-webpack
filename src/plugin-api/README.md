@@ -28,14 +28,26 @@ Activate the plugin by adding it to the `appcdWebpackPlugins` section in your `p
 
 ## API
 
-The Plugin API provides a set of hooks that you can use to modify the Webpack configuration. It also offers a couple of utility function that come in handy when writing plugins.
+The Plugin API provides a set of hooks that you can use to modify the Webpack configuration. It also offers a couple of utility functions that come in handy when writing plugins.
 
-### chainWebpack(config => {})
+### Hooks
+
+All hook functions accept two parameters. The first is the `value` that should be added, the second is an optional `options` object.
+
+The `options` object accepts the following properties, which are all optional:
+
+| Name | Type | Description |
+|---|---|---|
+| `name` | `string` | A name that will be associated with the added value. By default this is the plugin id. |
+| `before` | `string` | Used to modify the order in which hooks will be applied. By default they are added in same  order as plugins are loaded. Specify `before` to make sure a hook will execute before another hook, identified by it's `name`option. |
+| `before` | `string` | Used to modify the order in which hooks will be applied. By default they are added in same  order as plugins are loaded. Specify `after` to make sure a hook will execute after another hook, identified by it's `name`option. |
+
+#### `chainWebpack(config => {}, options)`
 
 Use [webpack-chain](https://github.com/neutrinojs/webpack-chain) to modify the Webpack configuration.
 
 ```js
-module.exports = (api, options) => {
+module.exports = (api) => {
   api.chainWebpack(config => {
     config.resolve.alias
       .set('~utils', path.join(api.getCwd(), 'utils'));
@@ -43,42 +55,44 @@ module.exports = (api, options) => {
 };
 ```
 
-### watch(files)
+#### `watch(files, options)`
 
 The `watch` hook lets you watch custom files for restarting the Webpack build process.
 
 ```js
-module.exports = (api, options) => {
+module.exports = (api) => {
   api.watch(['my.config.js'])
 };
 ```
 
-### getCwd()
+### Utility
+
+#### `getCwd()`
 
 Returns the current working directory. This is your project root directory.
 
 ```js
-module.exports = (api, options) => {
+module.exports = (api) => {
   const projectDir = api.getCwd();
 };
 ```
 
-### resolve(...paths)
+#### `resolve(...paths)`
 
 Resolves a path relative to the current working directory.
 
 ```js
-module.exports = (api, options) => {
+module.exports = (api) => {
   const platformDir = api.resolve('platform');
 };
 ```
 
-### hasPlugin(id)
+#### `hasPlugin(id)`
 
 Checks if there is another plugin with the given identifier.
 
 ```js
-module.exports = (api, options) => {
+module.exports = (api) => {
   if (api.hasPlugin('typescript')) {
     // do something if TypeScript plugin is available
   } else {
@@ -87,12 +101,12 @@ module.exports = (api, options) => {
 };
 ```
 
-### generateCacheConfig(name, baseIdentifier, configFiles)
+#### `generateCacheConfig(name, baseIdentifier, configFiles)`
 
-Generates a new configuration for cache-loader based on the passed identifier object and the content of any additional config files.
+Generates a new configuration for `cache-loader` based on the passed identifier object and the content of any additional config files.
 
 ```js
-module.exports = (api, options) => {
+module.exports = (api) => {
   api.chainWebpack(config => {
     config.module
       .rule('js')
