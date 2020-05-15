@@ -2,7 +2,7 @@ import webpack from 'webpack';
 import prettyTime from 'pretty-time';
 
 import { parseRequest, sendData, formatRequest } from '../../utils';
-import { analyzeBundle } from '../utils/analyzer';
+import { analyzeBundle } from '../analyzer';
 
 const { ProgressPlugin } = webpack;
 

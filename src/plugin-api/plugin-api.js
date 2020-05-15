@@ -2,7 +2,8 @@ import fs from 'fs';
 import hash from 'hash-sum';
 import path from 'path';
 import Config from 'webpack-chain';
-import { matchesPluginId } from './utils';
+
+import { matchesPluginId } from '../utils';
 
 /** @typedef {import("./context").default} PluginContext */
 
@@ -31,7 +32,7 @@ export default class PluginApi {
 			if (this[name]) {
 				throw new Error(`Restricted hook name used. "${name}" is a pre-defined PluginApi method.`);
 			}
-			this[name] = (value, options) => {
+			this[name] = (value, options = {}) => {
 				if (!options.name) {
 					options.name = this.id;
 				}
@@ -169,7 +170,7 @@ export default class PluginApi {
 
 	/**
 	 * Registers a task to run Webpack with different configurations, e.g. for
-	 * production, development or to analyze bundles
+	 * production, development or to analyze bundles.
 	 *
 	 * @param {string} name Task name
 	 * @param {Object} meta Meta data to describe the task

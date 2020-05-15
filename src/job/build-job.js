@@ -6,6 +6,7 @@ import defaultsDeep from 'lodash.defaultsdeep';
 import { schema } from './options';
 import pluginService from '../plugin-api/service';
 import {
+	prettyTime,
 	processStats,
 	validate,
 } from '../utils';
@@ -69,7 +70,7 @@ export default class BuildJob extends EventEmitter {
 				return;
 			}
 			this.inactivityTimeout = setTimeout(() => {
-				this.writeOutput(`No activity within the last ${inactivityTimeout}ms, stopping Webpack task.`);
+				this.writeOutput(`No activity within the last ${prettyTime(inactivityTimeout)}, stopping Webpack task.`);
 				this.stop();
 			}, inactivityTimeout);
 		});
@@ -166,10 +167,10 @@ export default class BuildJob extends EventEmitter {
 		validate(schema, newOptions);
 		this._options = newOptions;
 
-		const { project, build } = this._options;
+		const { type, project, build } = this._options;
 		this.name = project.name;
 		this.projectPath = project.path;
-		this.projectType = project.type;
+		this.projectType = type;
 		this.platform = build.platform;
 		this.deployType = build.deployType;
 	}
@@ -185,9 +186,9 @@ export default class BuildJob extends EventEmitter {
 
 		this.isStarting = true;
 		this.cleanupJobData();
-		let taskName = 'build';
-		// @TODO switch to serve task for non-production builds
+		let taskName = this.options.task;
 		const args = [
+			'--preserve-symlinks',
 			path.resolve(__dirname, 'task-runner.js'),
 			taskName
 		];
@@ -309,9 +310,9 @@ export default class BuildJob extends EventEmitter {
 				this.invalidationReason = message.data;
 				break;
 			}
-			case 'api-usage': {
-				for (const usageInfo of message.data) {
-					const { file, symbols = [], removed = false } = usageInfo;
+			case 'diagnostics': {
+				for (const diagnostics of message.data) {
+					const { file, symbols = [], removed = false } = diagnostics;
 					if (removed) {
 						delete this.tiSymbols[file];
 					} else {

@@ -2,11 +2,11 @@
 
 The plugin API lets you hook into the Webpack build process and modify it to fit your needs of every Titanium project.
 
-> 💡 The Plugin API is heavily inspired by VuePress and Vue CLI. In fact, it's a mix and match of several concepts from these two projects, adapted to the architecture of `appcd-plugin-webpack`. If you know how to write plugins for either of those, you will find yourself quite familiar with how plugins work here as well.
+> 💡 **TIP:** The Plugin API is heavily inspired by Vue CLI and VuePress. In fact, it's a mix and match of several concepts from these two projects, adapted to the architecture of `appcd-plugin-webpack`. If you know how to write plugins for Vue CLI, you will find yourself quite familiar with how plugins work here as well.
 
 ## Getting started
 
-Simply create a new plugin file that exports a function. This functions receives the Plugin API object and an options object containing information about the current environment, build settings and other options. Refer to the [Options](#options) section for more details on the `options` object.
+A plugin is an npm package or a local file that can add additional features to your project. Create a new plugin by file that exports a function. This functions receives the [Plugin API](#api) object and an options object containing information about the current environment, build settings and other options. Refer to the [Options](#options) section for more details on the `options` object.
 
 ```js
 // my-plugin.js
@@ -39,8 +39,8 @@ The `options` object accepts the following properties, which are all optional:
 | Name | Type | Description |
 |---|---|---|
 | `name` | `string` | A name that will be associated with the added value. By default this is the plugin id. |
-| `before` | `string` | Used to modify the order in which hooks will be applied. By default they are added in same  order as plugins are loaded. Specify `before` to make sure a hook will execute before another hook, identified by it's `name`option. |
-| `before` | `string` | Used to modify the order in which hooks will be applied. By default they are added in same  order as plugins are loaded. Specify `after` to make sure a hook will execute after another hook, identified by it's `name`option. |
+| `before` | `string` | Used to modify the order in which hooks will be applied. By default they are added in same  order as plugins are loaded. Specify `before` to make sure a hook will execute before another hook, identified by it's `name` option. |
+| `before` | `string` | Used to modify the order in which hooks will be applied. By default they are added in same  order as plugins are loaded. Specify `after` to make sure a hook will execute after another hook, identified by it's `name` option. |
 
 #### `chainWebpack(config => {}, options)`
 
@@ -128,7 +128,6 @@ The `options` objects holds contextual information about the project and the cur
 - `project`: Project info
   - `path`: Full path to the project.
   - `name`: Project name
-  - `type`: The project type. One of `alloy`, `classic`, `angular`, or `vue`. This value is used to choose the appropriate built-in Webpack config to load.
   - `tiapp`: The project's parsed `tiapp.xml`
 
 - `build`: Build settings passed from the Titanium CLI.
@@ -153,4 +152,6 @@ The `options` objects holds contextual information about the project and the cur
 
 - `transpileDependencies`: List of dependencies from the project's `node_modules` folder that should be transpiled via Babel. Pre-populated from values in your `tiapp.xml`.
 
-> ⚠️ Note: The options object is shared across all plugins and writable. You can use it to both read and write options. Be carefull when writing to the options and make sure you know what you are doing, since it can change the behavior of other plugins and the Webpack build.
+- `type`: The project type, one of `alloy`, `classic`, `angular`, or `vue`.
+
+> ⚠️ **Note:** The options object is shared across all plugins and writable. You can use it to both read and write options. Be carefull when writing to the options and make sure you know what you are doing, since it can change the behavior of other plugins and the Webpack build.

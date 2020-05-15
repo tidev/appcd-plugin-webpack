@@ -5,9 +5,6 @@ export const projectSchema = joi.object({
 		.required(),
 	name: joi.string()
 		.required(),
-	type: joi.string()
-		.valid('alloy', 'angular', 'classic', 'vue')
-		.required(),
 	tiapp: joi.object()
 		.unknown()
 });
