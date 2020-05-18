@@ -1,17 +1,17 @@
 import FSWatcher from 'appcd-fswatcher';
 import { EventEmitter } from 'events';
+import fs from 'fs';
 import path from 'path';
 import readPkg from 'read-pkg';
 
-import { loadModule } from './loader';
+import { interopRequireDefault, loadModule } from './loader';
 import PluginApi from './plugin-api';
-import { isPlugin } from './utils';
+import { isPlugin, ProjectDiagnostics } from '../utils';
+
+/** @typedef {import("./hooks/hook").default} Hook */
 
 /**
- * The plugin context.
- *
- * A plugin context serves as a grouping container for all plugins in a
- * specific directory.
+ * A grouping container for all plugins in a specific directory, i.e. a project.
  */
 export default class PluginContext extends EventEmitter {
 	/**
@@ -23,12 +23,20 @@ export default class PluginContext extends EventEmitter {
 	constructor(cwd, options) {
 		super();
 
+		if (!fs.existsSync(cwd)) {
+			throw new Error(`Invalid working directory, '${cwd}' does not exist.`);
+		}
+
 		/**
 		 * Current working directory of this plugin context.
 		 *
 		 * @type string
 		 */
 		this.cwd = cwd;
+		/**
+		 * package.json of the current working directory
+		 */
+		this.pkg = {};
 		/**
 		 * Map of hooks known in this context.
 		 *
@@ -40,7 +48,7 @@ export default class PluginContext extends EventEmitter {
 		 *
 		 * @type Object
 		 */
-		this.options = options;
+		this.options = options || {};
 		/**
 		 * List of built-in plugins
 		 */
@@ -63,6 +71,16 @@ export default class PluginContext extends EventEmitter {
 		 * @type Map<string, FSWatcher>
 		 */
 		this.watchers = new Map();
+		/**
+		 * Diagnostis data for the project.
+		 */
+		this.diagnostics = new ProjectDiagnostics();
+	}
+
+	initialize() {
+		this.readPkg();
+		this.builtInPlugins = this.resolveBuiltInPlugins();
+		this.resolveAndApplyPlugins();
 	}
 
 	/**
@@ -96,27 +114,50 @@ export default class PluginContext extends EventEmitter {
 		return this.hooks.get(name);
 	}
 
-	resolveAndApplyPlugins(builtInPlugins) {
-		if (builtInPlugins) {
-			this.builtInPlugins = builtInPlugins;
+	/**
+	 * Reads package.json from active working directory.
+	 */
+	readPkg() {
+		if (fs.existsSync(path.join(this.cwd, 'package.json'))) {
+			this.pkg = readPkg.sync({ cwd: this.cwd });
+		} else {
+			this.pkg = {};
 		}
-		const projectType = this.options.project.type;
-		const projectConfigPlugin = {
-			id: `built-in:config/${projectType}`,
-			apply: loadModule(`./${projectType}`, path.resolve(__dirname, '..', 'config'))
-		};
-		const plugins = this.resolvePlugins(this.builtInPlugins, [ projectConfigPlugin ]);
-		plugins.forEach(({ id, apply }) => this.applyPlugin(id, apply));
 	}
 
-	resolvePlugins(builtInPlugins, inlinePlugins) {
+	/**
+	 * Resolves built-in plugins.
+	 *
+	 * These will be loaded with the webpack plugin itself and don't need
+	 * fs-watching so we can use a simple require to load the apply function.
+	 *
+	 * @return {Array}
+	 */
+	resolveBuiltInPlugins() {
+		const idToPlugin = (id) => ({
+			id: id.replace(/^\.+\//, 'built-in:'),
+			// eslint-disable-next-line security/detect-non-literal-require
+			apply: interopRequireDefault(require(id))
+		});
+		return [
+			'../config/base',
+			'../config/prod',
+			'../config/app',
+			'../tasks/build',
+			'../tasks/serve'
+		].map(idToPlugin);
+	}
+
+	resolveAndApplyPlugins(inlinePlugins = [], useBuiltInPlugins = true) {
+		const builtInPlugins = useBuiltInPlugins ? this.builtInPlugins : [];
 		let plugins = [].concat(builtInPlugins);
 
 		if (inlinePlugins) {
 			plugins = plugins.concat(inlinePlugins);
 		}
 
-		const { cwd } = this;
+		this.readPkg();
+		const { cwd, pkg } = this;
 		const { watch } = this.options;
 		if (watch) {
 			const pkgPath = path.join(cwd, 'package.json');
@@ -128,7 +169,6 @@ export default class PluginContext extends EventEmitter {
 			});
 			this.watchers.set(pkgPath, pkgWatcher);
 		}
-		const pkg = readPkg.sync({ cwd });
 
 		// project plugins installed as dependencies
 		const projectPlugins = Object.keys(pkg.devDependencies || {})
@@ -173,7 +213,8 @@ export default class PluginContext extends EventEmitter {
 			}));
 		}
 
-		return plugins;
+		this.plugins = new Map(plugins.map(({ id, apply }) => [ id, apply ]));
+		this.plugins.forEach((apply, id) => this.applyPlugin(id, apply));
 	}
 
 	/**
@@ -183,7 +224,6 @@ export default class PluginContext extends EventEmitter {
 	 * @param {Function} apply Apply function exportet by the plugin file.
 	 */
 	applyPlugin(id, apply) {
-		this.plugins.set(id, apply);
 		const pluginApi = new PluginApi(id, this);
 		try {
 			apply(pluginApi, this.options);

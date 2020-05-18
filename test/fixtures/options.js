@@ -2,6 +2,8 @@ const path = require('path');
 
 const defaultOptions = {
 	identifier: '1234',
+	task: 'build',
+	type: 'classic',
 	build: {
 		target: 'simulator',
 		platform: 'ios',
@@ -19,11 +21,10 @@ const defaultOptions = {
 	watch: false
 };
 
-module.exports = function generateOptions(type, options) {
+module.exports = function generateOptions(testProject, options) {
 	const project = {
-		path: path.resolve(__dirname, 'projects', type),
-		type,
-		name: `webpack-test-${type}`
-	}
-	return Object.assign({ project }, defaultOptions, options);
+		path: path.resolve(__dirname, 'projects', testProject),
+		name: `webpack-test-${testProject}`
+	};
+	return Object.assign({ project }, defaultOptions, { ...options });
 };

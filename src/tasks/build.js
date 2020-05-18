@@ -1,5 +1,3 @@
-import webpack from 'webpack';
-
 import { DashboardPlugin, StateNotifierPlugin } from '../webpack';
 
 export default (api, options) => {
@@ -17,6 +15,7 @@ export default (api, options) => {
 		config.plugins.push(new DashboardPlugin(api.getCwd()));
 
 		return new Promise((resolve, reject) => {
+			const webpack = api.requirePeer('webpack');
 			webpack(config, (err, stats) => {
 				if (err) {
 					return reject(err);

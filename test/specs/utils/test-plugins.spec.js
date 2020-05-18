@@ -1,6 +1,6 @@
-import { matchesPluginId } from '../../../dist/plugin-api/utils';
+import { matchesPluginId } from '../../../dist/utils/plugins';
 
-describe('Plugin API - utils', () => {
+describe('utils - plugins', () => {
 	describe('matchesPluginId', () => {
 		it('should match full plugin id', () => {
 			const match = matchesPluginId(

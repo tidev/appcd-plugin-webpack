@@ -1,11 +1,11 @@
 import path from 'path';
 
-import { apiTracker } from '../utils/api-tracker';
 import { isWindows, parseRequest } from '../../utils';
 
 export class ApiTrackerPlugin {
 	constructor(options) {
-		this.excludePattern = this.generateExcludePattern((options && options.exclude) || []);
+		this.diagnostics = options.diagnostics;
+		this.excludePattern = this.generateExcludePattern(options.exclude || []);
 		this.tiNodeRegExp = /^Ti(tanium)?\./;
 		this.cwd = options.cwd;
 		this.watchRun = false;
@@ -25,7 +25,6 @@ export class ApiTrackerPlugin {
 					const handler = expression => {
 						const { module: { userRequest } } = parser.state;
 						const filePath = this.resolvePath(userRequest);
-						const symbols = apiTracker.getSymbolSet(filePath);
 						if (this.excludePattern && this.excludePattern.test(filePath)) {
 							return;
 						}
@@ -34,10 +33,7 @@ export class ApiTrackerPlugin {
 						if (!tiExpression) {
 							return;
 						}
-						const shortExpression = tiExpression.substring(9); // Drop leading 'Titanium.'
-						if (!symbols.has(shortExpression)) {
-							symbols.add(shortExpression);
-						}
+						this.diagnostics.recordApiUsage(filePath, tiExpression);
 					};
 					// We need to cheat the HookMap here since we don't know the expressions in advance
 					parser.hooks.expressionAnyMember.get = function (key) {
@@ -62,7 +58,7 @@ export class ApiTrackerPlugin {
 		);
 
 		compiler.hooks.done.tap('ApiTracker', () => {
-			apiTracker.sendUsage(this.watchRun ? this.changedModules : undefined);
+			this.diagnostics.send(this.watchRun ? this.changedModules : undefined);
 		});
 	}
 

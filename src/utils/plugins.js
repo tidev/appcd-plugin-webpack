@@ -8,9 +8,11 @@ import {
 	buildSchema,
 	projectSchema,
 	validate
-} from '../utils/schema';
+} from './schema';
 
 export const schema = createSchema(joi => joi.object({
+	identifier: joi.string()
+		.required(),
 	project: projectSchema,
 	build: buildSchema,
 	type: joi.string()
@@ -31,7 +33,7 @@ const defaults = () => ({
 });
 
 export function createPluginOptions(baseOptions) {
-	const { project, build, watch } = baseOptions;
+	const { identifier, type, project, build, watch } = baseOptions;
 	let options = {};
 
 	const tiAppPath = path.join(project.path, 'tiapp.xml');
@@ -40,8 +42,10 @@ export function createPluginOptions(baseOptions) {
 	}
 	const tiapp = new tiappxml(tiAppPath);
 	options = {
+		identifier,
+		type,
 		watch,
-		...tiapp.webpack
+		...tiapp.webpack || {}
 	};
 	options.project = { tiapp, ...project };
 	options.build = build;

@@ -1,7 +1,6 @@
 import PluginContext from './context';
 import Hook from './hooks/hook';
-import { interopRequireDefault } from './loader';
-import { createPluginOptions } from './utils';
+import { createPluginOptions } from '../utils';
 
 /**
  * @type Plugin
@@ -16,11 +15,8 @@ import { createPluginOptions } from './utils';
  */
 class PluginService {
 	constructor() {
-		this.builtInPlugins = [];
 		this.hooks = new Map();
 		this.contexts = new Map();
-
-		this.resolveBuiltInPlugins();
 	}
 
 	registerHook(name, hookClass = Hook) {
@@ -48,29 +44,9 @@ class PluginService {
 			const hook = new hookClass(name);
 			context.registerHook(name, hook);
 		});
-		context.resolveAndApplyPlugins(this.builtInPlugins);
+		context.initialize();
 
 		return context;
-	}
-
-	/**
-	 * Resolves built-in plugins.
-	 *
-	 * These will be loaded with the webpack plugin itself and don't need
-	 * fs-watching so we can use a simple require to load the apply function.
-	 */
-	resolveBuiltInPlugins() {
-		const idToPlugin = (id) => ({
-			id: id.replace(/^\.+\//, 'built-in:'),
-			// eslint-disable-next-line security/detect-non-literal-require
-			apply: interopRequireDefault(require(id))
-		});
-		this.builtInPlugins = [
-			'../config/base',
-			'../config/prod',
-			'../tasks/build',
-			'../tasks/serve'
-		].map(idToPlugin);
 	}
 }
 

@@ -28,25 +28,30 @@ Webpack support was first introduced with SDK version 9.1.0, so make sure you ar
 ti sdk install -b master
 ```
 
-> 💡 **NOTE:** The [PR](https://github.com/appcelerator/titanium_mobile/pull/11346) for Webpack support is not merged yet. For now you have to build the SDK yourself from the PR branch if you want to try it out.
+> 💡 **NOTE:** The [PR](https://github.com/appcelerator/titanium_mobile/pull/11346) for Webpack support is not merged yet. For now you have to build the SDK locally from the PR branch if you want to try it out.
 
 ### Enable Webpack in your Project
 
-Now that you have the neccessary tools installed you just need to enable Webpack in your project. Simply add a new `webpack` section to your `tiapp.xml` and specifiy the project type.
+Now that you have the neccessary global tools installed you just need to enable Webpack in your project. Install `webpack` and one of the new Titanium SDK Webpack Plugins into your project.
 
-```xml
-<ti:app>
-  <webpack>
-    <type>alloy</type>
-  </webpack>
-</ti:app>
+```sh
+npm i webpack @titanium-sdk/webpack-plugin-<type> -D
 ```
 
-For your existing projects you can choose between `alloy` and `classic`. The project type tells the Webpack plugin what configuration to load for your project.
+The following plugins are currently available:
+
+- `@titanium-sdk/webpack-plugin-classic`
+- `@titanium-sdk/webpack-plugin-alloy`
 
 ### Configure Babel
 
-[babel-loader](https://github.com/babel/babel-loader) is pre-configured for every Webpack enabled Titanium project. To properly transpile your JS code to the target platform you are building for, you need to install [@titanium-sdk/babel-preset-app](https://github.com/appcelerator/babel-preset-app#readme) into your project and create a `babel.config.js` with the following content:
+When migrating from the existing JavaScript build pipeline your are most likely used to Babel transpiling all JS code (unless you have set `<transpile>false</transpile` in your `tiapp.xml`, in that case you can skip this step). For Webpack, this is not the case by default since we want the Webpack build to be completely configurable.
+
+But don't worry, there is another plugin to enable Babel again in your project. Install [`@titanium-sdk/webpack-plugin-babel`](https://github.com/appcelerator/webpack-plugin-babel) and create a `babel.config.js` to select the default Titanium preset.
+
+```sh
+npm i @titanium-sdk/webpack-plugin-babel -D
+```
 
 ```js
 module.exports = {
@@ -56,7 +61,9 @@ module.exports = {
 };
 ```
 
-The preset will be configured automatically but you can overwrite options if you like. Take a look at the [options](https://github.com/appcelerator/babel-preset-app#options) to see what's available.
+The preset will be configured automatically for you, but you can overwrite options if you like. Take a look at the [options](https://github.com/appcelerator/babel-preset-app#options) to see what's available.
+
+> 💡 **NOTE:** Although we highly recommend using [`@titanium-sdk/babel-preset-app`](https://github.com/appcelerator/babel-preset-app) for Titanium Apps, you can use any other Babel presets or plugins if you like. Just be sure you know what you are doing since you need to configure them yourself.
 
 By default Webpack will **not** transpile anything from `node_modules`. However, you can explicitly include dependencies for transpilation in your `tiapp.xml`:
 
@@ -70,7 +77,7 @@ By default Webpack will **not** transpile anything from `node_modules`. However,
 </ti:app>
 ```
 
-## General guidelines
+## Code migration
 
 These are some general guidelines you should follow when using Webpack with Titanium. You need to apply these to your existing project when migrating from an Classic/Alloy Titanium project.
 
@@ -80,16 +87,18 @@ When bundling code with Webpack there are a few rules you need to follow in your
 
 #### Dynamic requires
 
+Dynamic requires with expressions need to be adopted to work well with webpack. Here is an example of a dynamic require:
+
 ```js
 import locale from `date-fns/locales/${locale}.js`
 ```
-
-Dynamic requires with expressions need to be adopted to work well with webpack. See [require with expression](https://webpack.js.org/guides/dependency-management/#require-with-expression) from Webpack docs for more details.
 
 A few general rules you should follow:
 
 - Have at least one static part in your expression.
 - Always add a file extension to avoid inclusion of unrelated file types.
+
+See [require with expression](https://webpack.js.org/guides/dependency-management/#require-with-expression) from Webpack docs for more details.
 
 #### Absolute paths
 
@@ -108,7 +117,7 @@ import 'module/lib/file';
 
 Modules are searched for inside the `node_modules` folder in your project.
 
-To support the non-spec behavior of the Titanium `require` implementation to look for modules in the app root directory as well, the following folders will also be searched to maintain backwards compaibility:
+To support the non-spec behavior of the Titanium `require` implementation, which looks for modules in the app root directory as well, the following folders will also be searched to maintain backwards compaibility:
 
 - Classic: `src`
 - Alloy: `app/lib` and `app/vendor`
@@ -119,19 +128,13 @@ Note that the folders are searched in order and the first match wins. Make sure 
 
 ### Aliases
 
-To make your life easier when dealing with relative imports throughout your project there are two pre-defined aliases.
+To make your life easier when dealing with relative imports throughout your project there is a pre-defined alias.
 
 - `@`: project source directory
   - **Classic**: `src`
-  - **Alloy**: `app/lib`
+  - **Alloy**: `app`
   - **Vue.js**: `src`
   - **Angular**: `src`
-
-- `~`: project non-code assets directory
-  - **Classic**: `src/assets`
-  - **Alloy**: `app/assets`
-  - **Vue.js**: `src/assets`
-  - **Angular**: `src/assets`
 
 ### Using NPM modules
 
@@ -317,7 +320,7 @@ Titanium comes with pre-defined Webpack configurations to get you started quickl
 
 ### Hook into webpack-chain
 
-To change the Webpack configuration you need to create a new plugin file somewhere in your project. This plugin file needs to export a function which will receive a [Plugin API](./hook-api/README.md) object and some genral project options. Using the Plugin API you can tap into the Webpack configuration.
+To change the Webpack configuration you need to create a new plugin file somewhere in your project. This plugin file needs to export a function which will receive a [Plugin API](./plugin-api/README.md) object and some genral project options. Using the Plugin API you can tap into the Webpack configuration.
 
 ```js
 // <project-root>/my-plugin.js
@@ -343,7 +346,7 @@ After you have created the plugin file you need to activate it in your `package.
 
 ### Examples
 
-The follwing examples demonstrate how to use the `chainWebpack` function to modify the Webpack configuration. Also take a look the extensive list of [examples from webpack-chain](https://github.com/neutrinojs/webpack-chain#getting-started) to see what else you can do with the `config` object.
+The follwing examples demonstrate how to use the `chainWebpack` function to modify the Webpack configuration. Also check out the extensive list of [examples from webpack-chain](https://github.com/neutrinojs/webpack-chain#getting-started) to see what else you can do with the `config` object.
 
 #### Add alias
 
