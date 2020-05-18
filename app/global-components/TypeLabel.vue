@@ -47,7 +47,7 @@ export default {
           return '#dc222f'
         case 'alloy':
         case 'classic':
-          return '#DB110F'
+          return '#D22630'
         case 'vue':
           return '#4fc08d'
         default:
