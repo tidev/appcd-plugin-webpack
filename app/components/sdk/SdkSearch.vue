@@ -113,7 +113,7 @@ import { base } from '@/utils/appcd'
 import { debounce } from '@/utils/events'
 import { normalizeReleases } from '@/utils/sdk'
 
-const withBase = base('titanium', '1.6.0')
+const withBase = base('titanium', '1.7.0')
 
 export default {
   data: () => ({

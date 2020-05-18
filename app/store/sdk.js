@@ -3,7 +3,7 @@ import Vue from 'vue'
 import { base } from '@/utils/appcd'
 import { normalizeReleases } from '@/utils/sdk'
 
-const withBase = base('titanium', '1.6.0')
+const withBase = base('titanium', '1.7.0')
 
 export const state = () => ({
   installed: [],

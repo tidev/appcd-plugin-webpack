@@ -2,7 +2,7 @@ import Vue from 'vue'
 
 import { base } from '@/utils/appcd'
 
-const withBase = base('webpack', '1.0.0')
+const withBase = base('webpack', 'latest')
 
 export const state = () => ({
   jobs: [],
