@@ -26,6 +26,11 @@ export const getters = {
       return job.state === 'error'
     })
   },
+  stoppedBuilds: state => {
+    return state.jobs.filter(job => {
+      return job.state === 'stopped'
+    })
+  },
   stats: state => state.stats,
   errors: (state, getters) => (getters.stats && getters.stats.errors) || [],
   warnings: (state, getters) => (getters.stats && getters.stats.warnings) || [],

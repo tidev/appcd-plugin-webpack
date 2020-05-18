@@ -33,10 +33,10 @@
     </v-row>
     <v-row>
       <v-col>
-        <dashboard-card class="card-tabs">
+        <dashboard-card class="card-tabs build-list">
           <v-card-title>
             <v-flex>
-              <v-tabs v-model="tabs" slider-color="white">
+              <v-tabs v-model="filter">
                 <span
                   class="font-weight-light mr-4 primary--text"
                   style="align-self: center"
@@ -93,7 +93,7 @@
             </v-list-item>
           </v-list>
 
-          <v-row justify="center">
+          <v-row justify="center" class="mt-8">
             <v-col cols="8">
               <v-alert
                 :value="items.length === 0"
@@ -103,7 +103,7 @@
                 prominent
                 dark
               >
-                There are currently no active Webpack builds.
+                There are currently no {{ filterName }} Webpack builds.
               </v-alert>
             </v-col>
           </v-row>
@@ -119,19 +119,43 @@ import { mapState, mapGetters } from 'vuex'
 import StatsCard from '@/components/StatsCard'
 import utilityMixin from '@/utils/mixin'
 
+const FILTER_ALL = 0
+const FILTER_ERROR = 1
+const FILTER_STOPPED = 2
+const filterNames = ['active', 'errored', 'stopped']
+
 export default {
   components: {
     StatsCard
   },
   mixins: [utilityMixin],
   data: () => ({
-    tabs: null
+    filter: null
   }),
   computed: {
     ...mapState('webpack', {
-      items: 'jobs'
+      allBuilds: 'jobs'
     }),
-    ...mapGetters('webpack', ['activeBuilds', 'idleBuilds', 'erroredBuilds']),
+    ...mapGetters('webpack', [
+      'activeBuilds',
+      'idleBuilds',
+      'erroredBuilds',
+      'stoppedBuilds'
+    ]),
+    items() {
+      if (this.filter === FILTER_ALL) {
+        return this.allBuilds
+      } else if (this.filter === FILTER_ERROR) {
+        return this.erroredBuilds
+      } else if (this.filter === FILTER_STOPPED) {
+        return this.stoppedBuilds
+      } else {
+        return this.allBuilds
+      }
+    },
+    filterName() {
+      return filterNames[this.filter] || 'active'
+    },
     activeBuildsSubText() {
       const length = this.activeBuilds.length
       if (length > 0) {
@@ -169,4 +193,7 @@ export default {
 <style lang="sass">
 .stats-value
   font-size: 48px
+
+.build-list
+  min-height: 275px
 </style>
