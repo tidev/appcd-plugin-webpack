@@ -48,7 +48,7 @@
                   All
                 </v-tab>
                 <v-tab class="mr-3">
-                  <v-icon class="mr-2">$information</v-icon>
+                  <v-icon class="mr-2">$alert</v-icon>
                   Error
                 </v-tab>
                 <v-tab>
@@ -81,7 +81,7 @@
                   {{ item.projectPath }}
                 </v-list-item-subtitle>
                 <v-list-item-subtitle>
-                  <div class="d-flex align-center">
+                  <div class="d-flex align-center grey--text">
                     <type-label :type="item.projectType"></type-label>
                     <span class="px-2 grey--text text--lighten-1">|</span>
                     <platform-label :platform="item.platform"></platform-label>

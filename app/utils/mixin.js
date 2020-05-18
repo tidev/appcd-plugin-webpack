@@ -7,8 +7,9 @@ export default {
         case 'building':
           return '$flask'
         case 'started':
-        case 'stopped':
           return '$webpack'
+        case 'stopped':
+          return '$stop'
         case 'error':
           return '$exclamation'
       }
@@ -16,12 +17,11 @@ export default {
     getIconClass(job) {
       switch (job.state) {
         case 'ready':
-          return 'primary'
         case 'building':
-          return 'warning'
+          return 'primary'
         case 'started':
         case 'stopped':
-          return 'grey'
+          return 'grey lighten-1'
         case 'error':
           return 'error'
       }
