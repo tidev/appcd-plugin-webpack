@@ -11,7 +11,7 @@ async function start({ dev = app.env !== 'production', port = 3000 } = {}) {
   const config = require(configPath)
   config.watch = [configPath]
   config.dev = dev
-  config.server = { port };
+  config.server = { port }
   if (!dev) {
     config._start = true
   }
@@ -39,7 +39,7 @@ async function start({ dev = app.env !== 'production', port = 3000 } = {}) {
 
   server = app.listen(port, host)
   server.on('connection', connection => {
-    const key = connection.remoteAddress + ':' + connection.remotePort;
+    const key = connection.remoteAddress + ':' + connection.remotePort
     connections[key] = connection
     connection.on('close', () => {
       delete connections[key]
