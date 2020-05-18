@@ -35,7 +35,7 @@ ti sdk install -b master
 Now that you have the neccessary global tools installed you just need to enable Webpack in your project. Install `webpack` and one of the new Titanium SDK Webpack Plugins into your project.
 
 ```sh
-npm i webpack @titanium-sdk/webpack-plugin-<type>
+npm i webpack @titanium-sdk/webpack-plugin-<type> -D
 ```
 
 The following plugins are currently available:
@@ -50,7 +50,7 @@ When migrating from the existing JavaScript build pipeline your are most likely 
 But don't worry, there is another plugin to enable Babel again in your project. Install [`@titanium-sdk/webpack-plugin-babel`](https://github.com/appcelerator/webpack-plugin-babel) and create a `babel.config.js` to select the default Titanium preset.
 
 ```sh
-npm i @titanium-sdk/webpack-plugin-babel
+npm i @titanium-sdk/webpack-plugin-babel -D
 ```
 
 ```js

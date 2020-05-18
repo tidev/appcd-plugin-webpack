@@ -6,7 +6,7 @@ The plugin API lets you hook into the Webpack build process and modify it to fit
 
 ## Getting started
 
-A plugin is an npm package or a local file that can add additional features to your project. Create a new plugin by file that exports a function. This functions receives the [Plugin API](#api) object and an options object containing information about the current environment, build settings and other options. Refer to the [Options](#options) section for more details on the `options` object.
+A plugin is an npm package or a local file that can add additional features to your project. Create a new plugin by creating a file that exports a function. This function receives the [Plugin API](#api) object and an options object containing information about the current environment, build settings and other options. Refer to the [Options](#options) section for more details on the `options` object.
 
 ```js
 // my-plugin.js
@@ -154,4 +154,4 @@ The `options` objects holds contextual information about the project and the cur
 
 - `type`: The project type, one of `alloy`, `classic`, `angular`, or `vue`.
 
-> ⚠️ **Note:** The options object is shared across all plugins and writable. You can use it to both read and write options. Be carefull when writing to the options and make sure you know what you are doing, since it can change the behavior of other plugins and the Webpack build.
+> ⚠️ **Warning:** The options object is shared across all plugins and writable. You can use it to both read and write options. Be careful when writing to the options and make sure you know what you are doing, since it can change the behavior of other plugins and the Webpack build.
