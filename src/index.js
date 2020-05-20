@@ -20,8 +20,10 @@ export async function activate(config) {
 
 	appcd.register('/status', statusService);
 
-	uiService.activate(config);
-	appcd.register('/web', uiService);
+	if (!process.env.APPCD_UI_DEV) {
+		uiService.activate(config);
+		appcd.register('/web', uiService);
+	}
 
 	jobService.activate(config);
 	appcd.register('/', jobService);
@@ -29,5 +31,7 @@ export async function activate(config) {
 
 export async function deactivate() {
 	await jobManager.stopAll();
-	uiService.deactivate();
+	if (!process.env.APPCD_UI_DEV) {
+		uiService.deactivate();
+	}
 }
