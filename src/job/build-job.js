@@ -249,7 +249,6 @@ export default class BuildJob extends EventEmitter {
 	async stop() {
 		if (typeof this.pid !== 'number') {
 			this.state = BuildJob.STATE_STOPPED;
-			this.cleanupJobData();
 			return;
 		}
 
@@ -268,7 +267,6 @@ export default class BuildJob extends EventEmitter {
 					this.off('state', handler);
 					clearTimeout(killTimeout);
 					this.pid = null;
-					this.cleanupJobData();
 					resolve();
 				}
 			};
