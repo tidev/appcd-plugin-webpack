@@ -36,34 +36,34 @@ describe('Hook', () => {
 		});
 
 		it('should insert at correct position using before option', () => {
-			hook.add('value1', { name: 'my-plugin1' });
-			hook.add('value2', { name: 'my-plugin2' });
 			hook.add('value3', { name: 'my-plugin3', before: 'my-plugin2' });
-			expect(hook.orderedRawValues).to.eql([
-				{ value: 'value1', name: 'my-plugin1' },
+			hook.add('value1', { name: 'my-plugin1' });
+			hook.add('value2', { name: 'my-plugin2', before: 'my-plugin1' });
+			expect(hook.orderedValues).to.eql([
 				{ value: 'value3', name: 'my-plugin3' },
-				{ value: 'value2', name: 'my-plugin2' }
+				{ value: 'value2', name: 'my-plugin2' },
+				{ value: 'value1', name: 'my-plugin1' }
 			]);
 			hook.add('value4', { name: 'my-plugin4', before: 'my-plugin1' });
-			expect(hook.orderedRawValues).to.eql([
-				{ value: 'value4', name: 'my-plugin4' },
-				{ value: 'value1', name: 'my-plugin1' },
+			expect(hook.orderedValues).to.eql([
 				{ value: 'value3', name: 'my-plugin3' },
-				{ value: 'value2', name: 'my-plugin2' }
+				{ value: 'value2', name: 'my-plugin2' },
+				{ value: 'value4', name: 'my-plugin4' },
+				{ value: 'value1', name: 'my-plugin1' }
 			]);
 		});
 
 		it('should insert at correct position using after option', () => {
+			hook.add('value3', { name: 'my-plugin3', after: 'my-plugin1' });
 			hook.add('value1', { name: 'my-plugin1' });
 			hook.add('value2', { name: 'my-plugin2' });
-			hook.add('value3', { name: 'my-plugin3', after: 'my-plugin1' });
-			expect(hook.orderedRawValues).to.eql([
+			expect(hook.orderedValues).to.eql([
 				{ value: 'value1', name: 'my-plugin1' },
 				{ value: 'value3', name: 'my-plugin3' },
 				{ value: 'value2', name: 'my-plugin2' }
 			]);
 			hook.add('value4', { name: 'my-plugin4', after: 'my-plugin2' });
-			expect(hook.orderedRawValues).to.eql([
+			expect(hook.orderedValues).to.eql([
 				{ value: 'value1', name: 'my-plugin1' },
 				{ value: 'value3', name: 'my-plugin3' },
 				{ value: 'value2', name: 'my-plugin2' },
@@ -75,9 +75,9 @@ describe('Hook', () => {
 			hook.add('value1', { name: 'my-plugin1' });
 			hook.add('value2', { name: 'my-plugin2' });
 			hook.add('value3', { name: 'my-plugin3', before: 'foo' });
-			expect(hook.orderedRawValues[2]).to.eql({ value: 'value3', name: 'my-plugin3' });
+			expect(hook.orderedValues[2]).to.eql({ value: 'value3', name: 'my-plugin3' });
 			hook.add('value4', { name: 'my-plugin4', after: 'foo' });
-			expect(hook.orderedRawValues[3]).to.eql({ value: 'value4', name: 'my-plugin4' });
+			expect(hook.orderedValues[3]).to.eql({ value: 'value4', name: 'my-plugin4' });
 		});
 	});
 
