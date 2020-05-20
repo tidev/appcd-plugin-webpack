@@ -93,9 +93,7 @@ export default class Hook {
 			const orderedValue = { name, value };
 			const insertAt = before || after;
 			const findIndex = before ? findFirstIndex : findLastIndex;
-			const i = findIndex(orderedValues, ({ name }) => {
-				return name === insertAt;
-			});
+			const i = findIndex(orderedValues, ({ name }) => name === insertAt);
 			if (i === -1) {
 				if (!rawValue.retried) {
 					// insertAt value not found yet, push back to the stack again
