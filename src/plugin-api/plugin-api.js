@@ -112,7 +112,7 @@ export default class PluginApi {
 	 * @return {Object} Config object for cache loader with cache directory and identifier
 	 */
 	generateCacheConfig(name, baseIdentifiers, configFiles = []) {
-		const cacheDirectory = this.resolve('build', '.cache', name);
+		const cacheDirectory = this.resolve('node_modules', '.cache', name);
 
 		const hashSource = {
 			baseIdentifiers,
