@@ -80,6 +80,7 @@
   "files": [
     "app/.nuxt/dist",
     "app/server",
+    "app/nuxt.config.js",
     "config",
     "dist"
   ],
