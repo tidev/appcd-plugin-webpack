@@ -71,7 +71,9 @@
     </v-slide-y-transition>
 
     <v-content>
-      <nuxt />
+      <v-fade-transition>
+        <nuxt />
+      </v-fade-transition>
     </v-content>
 
     <v-footer class="grey--text" app dark color="#0e1e24">
