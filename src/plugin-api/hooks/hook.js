@@ -83,7 +83,7 @@ export default class Hook {
 			.filter(v => !(v.before || v.after))
 			.map(({ name, value }) => ({ name, value }));
 		const needOrdering = this.rawValues.filter(v => v.before || v.after);
-		if (!needOrdering) {
+		if (needOrdering.length === 0) {
 			return orderedValues;
 		}
 		const stack = [ ...needOrdering ];
