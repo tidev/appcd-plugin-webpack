@@ -61,7 +61,15 @@ export class DashboardPlugin extends ProgressPlugin {
 			}
 
 			const hasErrors = stats.hasErrors();
-			const status = hasErrors ? 'with some errors' : 'successfully';
+			const hasWarnings = stats.hasWarnings();
+			let status = '';
+			if (hasErrors) {
+				status = 'with some errors';
+			} else if (hasWarnings) {
+				status = 'with some warnings';
+			} else {
+				status = 'successfully';
+			}
 
 			const time = this.state.start
 				? ' in ' + prettyTime(process.hrtime(this.state.start), 2)
@@ -72,7 +80,8 @@ export class DashboardPlugin extends ProgressPlugin {
 				progress: 100,
 				done: true,
 				message: `Compiled ${status}${time}`,
-				hasErrors
+				hasErrors,
+				hasWarnings
 			});
 
 			this.sendProgress();

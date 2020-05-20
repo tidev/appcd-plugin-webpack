@@ -332,8 +332,8 @@ export default class BuildJob extends EventEmitter {
 
 		this.history.unshift({
 			invalid: this.invalidationReason,
-			errors: (context.errors || []).length,
-			warnings: (context.warnings || []).length,
+			errors: context.hasErrors,
+			warnings: context.hasWarnings,
 			progress: context.progress,
 			message: context.message,
 			timestamp: new Date()

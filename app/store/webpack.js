@@ -90,7 +90,9 @@ export const actions = {
     context.commit('stats', stats)
   },
   async startJob(context, options) {
-    await this.$axios.post(withBase(`start`), { data: options })
+    await this.$axios.post(withBase(`start/${options.identifier}`), {
+      data: options
+    })
     context.commit('updateJob', {
       progress: {
         progress: 0

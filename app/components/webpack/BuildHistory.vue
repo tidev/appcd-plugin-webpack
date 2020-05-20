@@ -52,7 +52,13 @@ export default {
           historyEntry.divider = true
         }
 
-        historyEntry.state = entry.hasErrors ? 'error' : 'ready'
+        let state = 'ready'
+        if (entry.errors) {
+          state = 'error'
+        } else if (entry.warnings) {
+          state = 'warning'
+        }
+        historyEntry.state = state
 
         return historyEntry
       })

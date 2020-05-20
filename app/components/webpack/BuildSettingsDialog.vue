@@ -94,8 +94,10 @@ export default {
       this.saving = true
       await this.$store.dispatch('webpack/startJob', {
         identifier: this.job.id,
-        platform: this.fields.platform,
-        deployType: this.fields.deployType
+        build: {
+          platform: this.fields.platform,
+          deployType: this.fields.deployType
+        }
       })
       this.$store.commit('webpack/updateJob', this.fields)
       this.open = false

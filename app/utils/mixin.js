@@ -12,6 +12,8 @@ export default {
           return '$stop'
         case 'error':
           return '$exclamation'
+        case 'warning':
+          return '$alert'
       }
     },
     getIconClass(job) {
@@ -24,6 +26,8 @@ export default {
           return 'grey lighten-1'
         case 'error':
           return 'error'
+        case 'warning':
+          return 'warning'
       }
     }
   }

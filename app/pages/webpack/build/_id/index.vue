@@ -171,7 +171,6 @@ export default {
     },
     stopJob() {
       this.$store.dispatch('webpack/stopJob', this.job.id)
-      this.$store.commit('webpack/stats', null)
     }
   }
 }
