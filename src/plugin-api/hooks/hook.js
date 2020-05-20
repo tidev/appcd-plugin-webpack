@@ -73,27 +73,43 @@ export default class Hook {
 	}
 
 	/**
-	 * The ordered raw values
+	 * The ordered hook values
 	 *
-	 * @type {Array<RawHookValue>}
+	 * @type {Array<HookValue>}
 	 */
-	get orderedRawValues() {
-		let orderedValues = [];
-
-		for (const rawValue of this.rawValues) {
-			const { value, name, before, after } = rawValue;
-			const orderedValue = { value, name };
-			const insertionTarget = before || after;
-			if (!insertionTarget) {
-				orderedValues.push({ value, name });
-				continue;
-			}
+	get orderedValues() {
+		// all hooks without before/after can stay in the order as they were added
+		const orderedValues = this.rawValues
+			.filter(v => !(v.before || v.after))
+			.map(({ name, value }) => ({ name, value }));
+		const needOrdering = this.rawValues.filter(v => v.before || v.after);
+		if (!needOrdering) {
+			return orderedValues;
+		}
+		const stack = [ ...needOrdering ];
+		while (stack.length) {
+			const rawValue = stack.shift();
+			const { name, value, before, after } = rawValue;
+			const orderedValue = { name, value };
+			const insertAt = before || after;
 			const findIndex = before ? findFirstIndex : findLastIndex;
-			const i = findIndex(orderedValues, ({ name }) => name === insertionTarget);
+			const i = findIndex(orderedValues, ({ name }) => {
+				return name === insertAt;
+			});
 			if (i === -1) {
-				orderedValues.push(orderedValue);
+				if (!rawValue.retried) {
+					// insertAt value not found yet, push back to the stack again
+					rawValue.retried = true;
+					stack.push(rawValue);
+				} else {
+					delete rawValue.retried;
+					const orderKey = rawValue.before ? 'before' : 'after';
+					console.warn(`Unable to insert "${name}" ${orderKey} "${insertAt}" since "${insertAt}" was not found.`);
+					orderedValues.push(orderedValue);
+				}
 				continue;
 			}
+			delete rawValue.retried;
 			if (before) {
 				orderedValues.splice(i, 0, orderedValue);
 			} else if (after) {
@@ -153,7 +169,7 @@ export default class Hook {
 	 */
 	apply(...args) {
 		this.appliedValues = [];
-		for (const { value, name } of this.orderedRawValues) {
+		for (const { value, name } of this.orderedValues) {
 			try {
 				if (typeof value === 'function') {
 					this.appliedValues.push({
