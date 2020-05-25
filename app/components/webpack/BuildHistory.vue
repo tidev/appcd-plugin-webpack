@@ -53,9 +53,9 @@ export default {
         }
 
         let state = 'ready'
-        if (entry.errors) {
+        if (entry.hasErrors) {
           state = 'error'
-        } else if (entry.warnings) {
+        } else if (entry.hasWarnings) {
           state = 'warning'
         }
         historyEntry.state = state
