@@ -35,12 +35,12 @@
       </v-col>
       <v-col cols="6" class="justify-end">
         <v-btn-toggle v-model="viewToggle" mandatory color="primary">
-          <v-btn><v-icon left>$console</v-icon> Output</v-btn>
           <v-btn><v-icon left>$viewGrid</v-icon> Dashboard</v-btn>
+          <v-btn><v-icon left>$console</v-icon> Output</v-btn>
         </v-btn-toggle>
       </v-col>
     </v-row>
-    <v-row v-if="viewToggle == 1" class="content flex-grid">
+    <v-row v-if="viewToggle == 0" class="content flex-grid">
       <v-col cols="8">
         <build-status />
       </v-col>
@@ -98,7 +98,7 @@ export default {
   mixins: [utilityMixin],
   data: () => ({
     isStarting: false,
-    viewToggle: 1,
+    viewToggle: 0,
     progress: {
       progress: 0,
       message: '',
