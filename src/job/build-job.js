@@ -204,9 +204,11 @@ export default class BuildJob extends EventEmitter {
 			data: {
 				args,
 				ipc: true,
-				env: Object.assign({}, process.env, {
-					NODE_ENV: this.deployType
-				})
+				options: {
+					env: Object.assign({}, process.env, {
+						NODE_ENV: this.deployType
+					})
+				}
 			}
 		});
 		response.on('data', data => {

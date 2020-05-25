@@ -1,10 +1,12 @@
 /* eslint indent: ["error", "tab", { "MemberExpression": "off" }] */
 
-const FriendlyErrorsPlugin = require('@soda/friendly-errors-webpack-plugin');
-const path = require('path');
-const TerserPlugin = require('terser-webpack-plugin');
+import FriendlyErrorsPlugin from '@soda/friendly-errors-webpack-plugin';
+import path from 'path';
+import TerserPlugin from 'terser-webpack-plugin';
 
-module.exports = function (api, options) {
+import terserOptions from './terserOptions';
+
+export default (api, options) => {
 	const resolveLocal = (...args) => {
 		return path.resolve(__dirname, '..', '..', ...args);
 	};
@@ -41,6 +43,6 @@ module.exports = function (api, options) {
 
 		config.optimization
 			.minimizer('terser')
-				.use(TerserPlugin);
+				.use(TerserPlugin, [ terserOptions(options) ]);
 	});
 };
