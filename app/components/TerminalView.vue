@@ -91,6 +91,9 @@ export default {
     },
     async fit() {
       const term = this.$terminal
+      if (!term) {
+        return
+      }
       term.element.style.display = 'none'
       await this.$nextTick()
       this.$fitAddon.fit()

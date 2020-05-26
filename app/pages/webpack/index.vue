@@ -1,7 +1,7 @@
 <template>
   <v-container>
-    <v-row>
-      <v-col cols="4" xs="12">
+    <v-row class="d-none d-md-flex">
+      <v-col cols="4">
         <stats-card
           icon="$webpack"
           title="Active Builds"
@@ -10,7 +10,7 @@
           :sub-text="activeBuildsSubText"
         />
       </v-col>
-      <v-col cols="4" xs="12">
+      <v-col cols="4">
         <stats-card
           color="green"
           icon="$timerSand"
@@ -20,7 +20,7 @@
           sub-text="Watching for changes ..."
         />
       </v-col>
-      <v-col cols="4" xs="12">
+      <v-col cols="4">
         <stats-card
           color="red"
           icon="$alert"

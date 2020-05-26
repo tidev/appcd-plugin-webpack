@@ -19,9 +19,17 @@
       </v-toolbar-items>
     </v-app-bar>
 
-    <v-navigation-drawer v-model="drawer" app clipped color="grey lighten-4">
+    <v-navigation-drawer
+      v-model="drawer"
+      app
+      clipped
+      color="grey lighten-4"
+      :mobile-break-point="0"
+      :disable-resize-watcher="true"
+      :mini-variant="miniVariant"
+    >
       <v-list class="grey lighten-4">
-        <template v-for="(item, i) in items">
+        <template v-for="(item, i) in navItems">
           <v-subheader v-if="item.heading" :key="i">
             {{ item.heading }}
           </v-subheader>
@@ -98,10 +106,22 @@ export default {
     }
   },
   computed: {
+    navItems() {
+      return this.items.filter(i => {
+        if (this.$vuetify.breakpoint.mdAndDown && i.heading) {
+          return false
+        }
+
+        return true
+      })
+    },
     showConnectionAlert() {
       return !this.connected
     },
-    ...mapState(['connected'])
+    ...mapState(['connected']),
+    miniVariant() {
+      return this.$vuetify.breakpoint.mdAndDown
+    }
   }
 }
 </script>

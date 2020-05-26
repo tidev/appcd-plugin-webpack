@@ -1,10 +1,7 @@
 <template>
   <v-container>
     <v-row>
-      <v-col cols="6">
-        <sdk-list />
-      </v-col>
-      <v-col cols="6">
+      <v-col cols="12" md="6">
         <v-scale-transition>
           <update-notification
             v-if="updateAvailable"
@@ -13,6 +10,9 @@
           />
         </v-scale-transition>
         <sdk-search />
+      </v-col>
+      <v-col cols="12" md="6">
+        <sdk-list />
       </v-col>
     </v-row>
   </v-container>
