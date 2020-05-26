@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events'
 import { decode } from '@msgpack/msgpack'
-import uuid from 'uuid'
+import { v4 as uuid } from 'uuid'
 
 function decodeData(data) {
   try {
@@ -25,7 +25,7 @@ class Subscription extends EventEmitter {
 
   unsubscribe() {
     const request = {
-      id: uuid.v4(),
+      id: uuid(),
       version: '1.0',
       path: this.path,
       type: 'unsubscribe',
@@ -97,7 +97,7 @@ class SubscriptionClient extends EventEmitter {
 
   subscribe(path) {
     const request = {
-      id: uuid.v4(),
+      id: uuid(),
       version: '1.0',
       path,
       type: 'subscribe'
