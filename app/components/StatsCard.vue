@@ -24,11 +24,26 @@
 <script>
 export default {
   props: {
-    title: String,
-    icon: String,
-    value: String,
-    subIcon: String,
-    subText: String
+    title: {
+      type: String,
+      required: true
+    },
+    icon: {
+      type: String,
+      required: true
+    },
+    value: {
+      type: String,
+      required: true
+    },
+    subIcon: {
+      type: String,
+      required: true
+    },
+    subText: {
+      type: String,
+      required: true
+    }
   }
 }
 </script>

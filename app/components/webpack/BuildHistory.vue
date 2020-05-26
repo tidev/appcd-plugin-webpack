@@ -33,8 +33,8 @@
 <script>
 import { mapState } from 'vuex'
 
-import utilsMixin from '@/utils/mixin'
 import StatsLoading from './StatsLoading'
+import utilsMixin from '@/utils/mixin'
 
 export default {
   components: {

@@ -129,6 +129,13 @@ export default {
     StatsCard
   },
   mixins: [utilityMixin],
+  async fetch({ error, store }) {
+    try {
+      await store.dispatch('webpack/fetchJobs')
+    } catch (e) {
+      error({ message: 'Failed to get Webpack job list from Daemon.' })
+    }
+  },
   data: () => ({
     filter: null
   }),
@@ -175,13 +182,6 @@ export default {
       }
 
       return 'No builds with errors'
-    }
-  },
-  async fetch({ error, store }) {
-    try {
-      await store.dispatch('webpack/fetchJobs')
-    } catch (e) {
-      error({ message: 'Failed to get Webpack job list from Daemon.' })
     }
   },
   head: () => ({

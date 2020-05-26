@@ -96,6 +96,13 @@ export default {
     TerminalView: () => import('@/components/TerminalView')
   },
   mixins: [utilityMixin],
+  async fetch({ error, params, store }) {
+    try {
+      await store.dispatch('webpack/fetchJob', params.id)
+    } catch (e) {
+      error({ statusCode: 404, message: 'Job not found' })
+    }
+  },
   data: () => ({
     isStarting: false,
     viewToggle: 0,
@@ -123,18 +130,6 @@ export default {
           disabled: true
         }
       ]
-    }
-  },
-  async fetch({ error, params, store }) {
-    try {
-      await store.dispatch('webpack/fetchJob', params.id)
-    } catch (e) {
-      error({ statusCode: 404, message: 'Job not found' })
-    }
-  },
-  head() {
-    return {
-      title: `Webpack - ${this.job.name}`
     }
   },
   async mounted() {
@@ -171,6 +166,11 @@ export default {
     },
     stopJob() {
       this.$store.dispatch('webpack/stopJob', this.job.id)
+    }
+  },
+  head() {
+    return {
+      title: `Webpack - ${this.job.name}`
     }
   }
 }

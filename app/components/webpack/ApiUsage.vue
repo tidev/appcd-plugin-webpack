@@ -20,7 +20,7 @@
       <stats-loading v-if="!apiTreeItems.length" />
       <div v-else class="treeview-wrapper">
         <v-treeview :items="apiTreeItems" dense hoverable open-on-click>
-          <template v-slot:prepend="{ item, open }">
+          <template v-slot:prepend="{ item }">
             <v-icon v-if="item.type === 'namespace'" color="primary">
               $cube
             </v-icon>

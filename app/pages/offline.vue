@@ -15,9 +15,6 @@
 
 <script>
 export default {
-  head: () => ({
-    title: 'Daemon is offline'
-  }),
   mounted() {
     this.pingInterval = setInterval(async () => {
       try {
@@ -34,6 +31,9 @@ export default {
   },
   destroyed() {
     clearInterval(this.pingInterval)
-  }
+  },
+  head: () => ({
+    title: 'Daemon is offline'
+  })
 }
 </script>

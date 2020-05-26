@@ -23,8 +23,8 @@
 <script>
 import { mapGetters } from 'vuex'
 
-import { size } from '@/utils/filters'
 import StatsLoading from './StatsLoading'
+import { size } from '@/utils/filters'
 
 export default {
   components: {

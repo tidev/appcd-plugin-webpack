@@ -29,13 +29,13 @@ export default {
     SdkSearch,
     UpdateNotification
   },
-  computed: {
-    ...mapState('sdk', ['installed', 'latestRelease']),
-    ...mapGetters('sdk', ['updateAvailable'])
-  },
   async fetch({ store }) {
     await store.dispatch('sdk/fetchInstalled')
     await store.dispatch('sdk/fetchReleases')
+  },
+  computed: {
+    ...mapState('sdk', ['installed', 'latestRelease']),
+    ...mapGetters('sdk', ['updateAvailable'])
   }
 }
 </script>
