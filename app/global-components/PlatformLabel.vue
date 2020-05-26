@@ -39,7 +39,7 @@ export default {
     iconColor() {
       switch (this.platform) {
         case 'android':
-          return '#78C257'
+          return '#3DDC84'
         case 'ios':
         case 'iphone':
           return '#A3AAAE'
