@@ -29,6 +29,7 @@ export const getters = {
 
 export const mutations = {
   setInstalled(state, installed) {
+    installed.forEach(i => i.manifest.platforms.sort())
     Vue.set(state, 'installed', installed)
   },
   setReleases(state, releases) {
@@ -45,6 +46,12 @@ export const mutations = {
   },
   uninstalling(state, uninstalling) {
     state.uninstalling = uninstalling
+  },
+  uninstalled(state, sdkVersion) {
+    const index = state.installed.findIndex(i => i.name === sdkVersion)
+    if (index !== -1) {
+      state.installed.splice(index, 1)
+    }
   }
 }
 
@@ -88,8 +95,10 @@ export const actions = {
   },
   async uninstall(context, sdkVersion) {
     context.commit('uninstalling', true)
-    await this.$axios.post(withBase(`sdk/uninstall/${sdkVersion}`))
-    await context.dispatch('fetchInstalled')
+    await this.$axios.post(withBase(`sdk/uninstall/${sdkVersion}`), {
+      data: {}
+    })
+    context.commit('uninstalled', sdkVersion)
     context.commit('uninstalling', false)
   }
 }
