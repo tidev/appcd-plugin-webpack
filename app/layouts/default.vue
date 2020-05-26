@@ -90,7 +90,6 @@ export default {
       drawer: null,
       items: [
         { heading: 'General' },
-        { text: 'System Info', icon: '$devices', link: '/titanium/info' },
         { text: 'SDK', icon: '$titanium', link: '/titanium/sdk' },
         { heading: 'Build' },
         { text: 'Webpack', icon: '$webpack', link: '/webpack' }
