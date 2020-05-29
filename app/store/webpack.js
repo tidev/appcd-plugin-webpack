@@ -102,7 +102,7 @@ export const actions = {
   async stopJob(context, id) {
     try {
       await this.$axios.get(withBase(`stop/${id}`))
-      context.commit('updateJob', { state: 'stopped', tiSymbols: null })
+      context.commit('updateJob', { state: 'stopped' })
     } catch (e) {
       context.commit('updateJob', { state: 'error' })
     }
