@@ -34,7 +34,9 @@ export default {
       }
     },
     progress() {
-      if (this.job.state !== 'ready') {
+      if (this.job.state === 'stopped') {
+        return 0
+      } else if (this.job.state !== 'ready') {
         return this.job.progress.progress
       } else {
         return 100
