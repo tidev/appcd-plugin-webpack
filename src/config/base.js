@@ -37,7 +37,9 @@ export default (api, options) => {
 		// plugins -----------------------------------------------------------------
 
 		config.plugin('friendly-errors')
-			.use(FriendlyErrorsPlugin);
+			.use(FriendlyErrorsPlugin, [{
+				clearConsole: false
+			}]);
 
 		// optimization ------------------------------------------------------------
 
