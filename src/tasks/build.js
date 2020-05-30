@@ -11,8 +11,8 @@ export default (api, options) => {
 			config.watch = true;
 		}
 
-		config.plugins.push(new StateNotifierPlugin());
 		config.plugins.push(new DashboardPlugin(api.getCwd()));
+		config.plugins.push(new StateNotifierPlugin());
 
 		return new Promise((resolve, reject) => {
 			const webpack = api.requirePeer('webpack');
