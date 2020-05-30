@@ -98,7 +98,7 @@ export class DashboardPlugin extends ProgressPlugin {
 		}
 	}
 
-	updateProgress (percent = 0, message = '', details = []) {
+	updateProgress(percent = 0, message = '', details = []) {
 		const progress = Math.floor(percent * 100);
 
 		Object.assign(this.state, {
@@ -108,7 +108,7 @@ export class DashboardPlugin extends ProgressPlugin {
 			request: parseRequest(details[2], this.cwd)
 		});
 
-		if (Date.now() - this.lastProgressUpdate > 100) {
+		if (Date.now() - this.lastProgressUpdate > 50) {
 			this.sendProgress();
 		}
 	}
