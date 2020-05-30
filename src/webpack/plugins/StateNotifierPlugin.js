@@ -2,10 +2,7 @@ import { sendData } from '../../utils';
 
 export class StateNotifierPlugin {
 	apply(compiler) {
-		compiler.hooks.beforeRun.tap('StateNotifier:beforeRun', _compiler => {
-			sendData('state', 'compiling');
-		});
-		compiler.hooks.watchRun.tap('StateNotifier:watchRun', _compiler => {
+		compiler.hooks.beforeCompile.tap('StateNotifier:beforeCompile', _compiler => {
 			sendData('state', 'compiling');
 		});
 		compiler.hooks.invalid.tap('StateNotifier:invalid', (fileName, changeTime) => {
