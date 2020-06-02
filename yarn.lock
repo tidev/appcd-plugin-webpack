@@ -12487,10 +12487,10 @@ webpack-sources@^1.0.1, webpack-sources@^1.1.0, webpack-sources@^1.4.0, webpack-
     source-list-map "^2.0.0"
     source-map "~0.6.1"
 
-webpack-target-titanium@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/webpack-target-titanium/-/webpack-target-titanium-2.0.0.tgz#6e05a64e898e48e56f3ddc8324eb5a104c82e39d"
-  integrity sha512-qMT01XS4Qpc4W4VBzfJ3e0eOfR5i2lMCHoXSkLiBwBwgp9VJYDoiiVcrlv5kCcFQ7WXkjcgM+8aMX/nf8PhIzg==
+webpack-target-titanium@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/webpack-target-titanium/-/webpack-target-titanium-2.1.0.tgz#7fcb6a6f35e3d7c7c820f2acd62d4268971e5451"
+  integrity sha512-dMlX6roYLqStifFpl1/VzmduThBRckjU1+kUHQiDb23N3xFDJ2UPca1tvRk9nuQFCPhXU6JDi7nK7hAeKI1rFg==
   dependencies:
     webpack-sources "^1.1.0"
 
