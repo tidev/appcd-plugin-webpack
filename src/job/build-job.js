@@ -19,6 +19,7 @@ const defaultJsonFields = [
 	'projectType',
 	'platform',
 	'state',
+	'activityTimestamp',
 	'history'
 ];
 const jsonTemplateConfig = {
@@ -60,6 +61,7 @@ export default class BuildJob extends EventEmitter {
 		};
 		this.tiSymbols = {};
 		this.inactivityTimeout = null;
+		this.activityTimestamp = Date.now();
 
 		const inactivityTimeout = config.inactivityTimeout;
 		this.on('state', (job, state) => {
@@ -212,6 +214,7 @@ export default class BuildJob extends EventEmitter {
 			}
 		});
 		response.on('data', data => {
+			this.activityTimestamp = Date.now();
 			switch (data.type) {
 				case 'spawn': {
 					clearTimeout(startTimeout);

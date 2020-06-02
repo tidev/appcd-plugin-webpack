@@ -11,23 +11,31 @@ export const state = () => ({
 })
 
 export const getters = {
-  activeBuilds: state => {
-    return state.jobs.filter(job => {
+  allBuilds: state => {
+    return [...state.jobs].sort((a, b) => {
+      if (a.activityTimestamp === b.activityTimestamp) {
+        return 0
+      }
+      return a.activityTimestamp > b.activityTimestamp ? -1 : 1
+    })
+  },
+  activeBuilds: (state, getters) => {
+    return getters.allBuilds.filter(job => {
       return job.state === 'building'
     })
   },
-  idleBuilds: state => {
-    return state.jobs.filter(job => {
+  idleBuilds: (state, getters) => {
+    return getters.allBuilds.filter(job => {
       return job.state === 'ready'
     })
   },
-  erroredBuilds: state => {
-    return state.jobs.filter(job => {
+  erroredBuilds: (state, getters) => {
+    return getters.allBuilds.filter(job => {
       return job.state === 'error'
     })
   },
-  stoppedBuilds: state => {
-    return state.jobs.filter(job => {
+  stoppedBuilds: (state, getters) => {
+    return getters.allBuilds.filter(job => {
       return job.state === 'stopped'
     })
   },

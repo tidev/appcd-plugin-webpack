@@ -114,7 +114,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex'
+import { mapGetters } from 'vuex'
 
 import StatsCard from '@/components/StatsCard'
 import utilityMixin from '@/utils/mixin'
@@ -140,10 +140,8 @@ export default {
     filter: null
   }),
   computed: {
-    ...mapState('webpack', {
-      allBuilds: 'jobs'
-    }),
     ...mapGetters('webpack', [
+      'allBuilds',
       'activeBuilds',
       'idleBuilds',
       'erroredBuilds',
@@ -166,9 +164,9 @@ export default {
     activeBuildsSubText() {
       const length = this.activeBuilds.length
       if (length > 0) {
-        const plural = length > 0
-        return `There ${plural ? 'are' : 'is'} ${length}
-          ${plural ? 'builds' : 'build'} active.`
+        const plural = length > 1
+        return `There ${plural ? 'are' : 'is'} ${length} active
+          ${plural ? 'builds' : 'build'}.`
       } else {
         return 'No builds are currently active'
       }
