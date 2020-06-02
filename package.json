@@ -1,7 +1,7 @@
 {
   "name": "@appcd/plugin-webpack",
   "version": "0.1.0",
-  "description": "Manage Webpack builds with the Appc Daemon",
+  "description": "Manage Webpack builds with Appc Daemon",
   "main": "./dist/index.js",
   "scripts": {
     "app:build": "cross-env NODE_OPTIONS=--max-old-space-size=4096 nuxt build -c app/nuxt.config.js --generate=false",
