@@ -8,12 +8,12 @@ Appcd plugin to manage Webpack build tasks.
 
 By default Titanium uses Babel to transform your JavaScript code and run optimizations. This works great out of the box, however you have very little control over this process and can only customize it with Babel plugins. Also, integrating new tooling into this pipeline via CLI hooks feels kind of "hacky", and in most cases is very specific to a single project. To address these issues, as well as building the proper foundation for upcoming Vue.js and Angular integration, we decided to introduce Webpack as an alternative build pipeline for all your app's assets.
 
-Switching to the Webpack build enables some great improvemnts:
+Switching to the Webpack build enables a lot of great improvemnts:
 
+- Significantly faster build times for both clean and incremental builds, especially for larger projects.
 - Pre-configured for your Titanium project, no need to deal with Webpack configuration files to get you up and running.
 - Highly customizable via a simple plugin API, which allows you to hook into the Webpack configuration with [webpack-chain](https://github.com/neutrinojs/webpack-chain). Add new loaders and/or plugins to introduce new capabilites into your project.
 - Easily use your favorite modules from NPM. Just install them into the project root.
-- Significantly faster build times, especially for larger projects.
 - Web UI to view build results and analyze your app bundle assets.
 
 ## Getting started
