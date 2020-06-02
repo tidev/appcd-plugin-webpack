@@ -11,11 +11,12 @@ export default class WebUiService extends Dispatcher {
 		const dev = typeof process.env.APPCD_UI_DEV !== 'undefined';
 		startNuxt({ dev, port });
 
-		this.register('/:path?', ctx => {
+		this.register('/:path(.*)', ctx => {
+			const path = ctx.path || '/';
 			return `<html>
 				<head>
 					<script>
-						window.location = 'http://localhost:${port}/webpack';
+						window.location = 'http://localhost:${port}/webpack${path}';
 					</script>
 				</head>
 				<body>
