@@ -85,7 +85,7 @@
     "dist"
   ],
   "appcd": {
-    "appcdVersion": "^3.2.0",
+    "apiVersion": "^1.1.0 || ^2.0.0",
     "inactivityTimeout": 600000,
     "name": "webpack",
     "type": "external",
