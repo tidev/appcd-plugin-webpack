@@ -110,7 +110,10 @@ export default (api, options) => {
 		const nativeModules = [ ...new Set(tiapp.modules.map(m => m.id)) ];
 		config.plugin('titanium-externals')
 			.use(TitaniumExternalsPlugins, [
-				nativeModules
+				[
+					...nativeModules,
+					/\.?\/?semantic.colors.json$/
+				]
 			]);
 		config.plugin('alias-externals')
 			.use(AliasExternalsPlugin, [
