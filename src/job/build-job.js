@@ -323,6 +323,11 @@ export default class BuildJob extends EventEmitter {
 					}
 				}
 				this.emit('api-usage', this.tiSymbols);
+				break;
+			}
+			case 'stats': {
+				this.storeStats(message.data);
+				break;
 			}
 		}
 	}
@@ -333,8 +338,6 @@ export default class BuildJob extends EventEmitter {
 	}
 
 	storeBuildResult(context) {
-		this.stats = processStats(context.stats);
-
 		this.history.unshift({
 			invalid: this.invalidationReason,
 			hasErrors: context.hasErrors,
@@ -349,6 +352,11 @@ export default class BuildJob extends EventEmitter {
 		this.invalidationReason = null;
 
 		this.emit('done', this);
+	}
+
+	storeStats(stats) {
+		this.stats = processStats(stats);
+		this.emit('stats', this.stats);
 	}
 
 	writeOutput(output) {

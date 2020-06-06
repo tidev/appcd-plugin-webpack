@@ -2,7 +2,6 @@ import webpack from 'webpack';
 import prettyTime from 'pretty-time';
 
 import { parseRequest, sendData, formatRequest } from '../../utils';
-import { analyzeBundle } from '../analyzer';
 
 const { ProgressPlugin } = webpack;
 
@@ -14,7 +13,8 @@ const DEFAULT_STATE = {
 	message: '',
 	details: [],
 	request: null,
-	hasErrors: false
+	hasErrors: false,
+	hasWarnings: false
 };
 
 export class DashboardPlugin extends ProgressPlugin {
@@ -23,7 +23,6 @@ export class DashboardPlugin extends ProgressPlugin {
 
 		this.cwd = cwd;
 		this.lastProgressUpdate = Date.now();
-		this.assetSources = new Map();
 
 		// Override handler from base ProgressPlugin
 		this.handler = (percent, message, ...details) => {
@@ -45,14 +44,6 @@ export class DashboardPlugin extends ProgressPlugin {
 				...DEFAULT_STATE,
 				start: process.hrtime()
 			});
-		});
-
-		compiler.hooks.afterEmit.tap('AppcdDashboard:afterEmit', compilation => {
-			this.assetSources = new Map();
-			for (const name in compilation.assets) {
-				const asset = compilation.assets[name];
-				this.assetSources.set(name, asset.source());
-			}
 		});
 
 		compiler.hooks.done.tap('AppcdDashboard:done', stats => {
@@ -86,9 +77,9 @@ export class DashboardPlugin extends ProgressPlugin {
 
 			this.sendProgress();
 
-			const statsData = stats.toJson();
-			analyzeBundle(statsData, this.assetSources, compiler.options.output.path);
-			sendData('dashboard', { type: 'done', data: { ...this.state, stats: statsData } });
+			sendData('dashboard', { type: 'done', data: { ...this.state } });
+
+			console.log('Dashboard.done');
 		});
 	}
 

@@ -44,6 +44,7 @@ export default class StatusService extends ServiceDispatcher {
 				historyEntry: job.history[0],
 				stats: job.stats
 			}), sid);
+			this.addEventListenerForSubscription(job, 'stats', stats => publish({ event: 'stats', stats }), sid);
 
 			publish({ event: 'state', state: job.state });
 		} else {

@@ -1,4 +1,4 @@
-import { DashboardPlugin, StateNotifierPlugin } from '../webpack';
+import { DashboardPlugin, StateNotifierPlugin, StatsPlugin } from '../webpack';
 
 export default (api, options) => {
 	api.registerTask('build', {
@@ -13,6 +13,7 @@ export default (api, options) => {
 
 		config.plugins.push(new DashboardPlugin(api.getCwd()));
 		config.plugins.push(new StateNotifierPlugin());
+		config.plugins.push(new StatsPlugin());
 
 		return new Promise((resolve, reject) => {
 			const webpack = api.requirePeer('webpack');
