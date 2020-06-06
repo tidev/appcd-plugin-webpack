@@ -63,40 +63,8 @@ export default class BuildJob extends EventEmitter {
 		this.inactivityTimeout = null;
 		this.activityTimestamp = Date.now();
 
-		const inactivityTimeout = config.inactivityTimeout;
-		this.on('state', (job, state) => {
-			if (this.inactivityTimeout !== null) {
-				clearTimeout(this.inactivityTimeout);
-			}
-			if (state === BuildJob.STATE_STOPPED) {
-				return;
-			}
-			this.inactivityTimeout = setTimeout(() => {
-				this.writeOutput(`No activity within the last ${prettyTime(inactivityTimeout)}, stopping Webpack task.`);
-				this.stop();
-			}, inactivityTimeout);
-		});
-
-		if (this.options.watch) {
-			const pluginContext = pluginService.createPluginContext(this.projectPath, this.options);
-			pluginContext.applyHook('watch').appliedValues.forEach(({ value: watchList }) => {
-				for (const file of watchList) {
-					const watcher = new FSWatcher(path.join(this.projectPath, file));
-					watcher.on('change', e => {
-						this.writeOutput(`Restarting due to changes in ${file}`);
-						this.restart();
-					});
-				}
-			});
-			pluginContext.on('change', e => {
-				this.writeOutput(`Restarting due to changes in plugin "${e.id}"`);
-				this.restart();
-			});
-			pluginContext.on('reload', e => {
-				this.writeOutput('Restarting due to Plugin API reload');
-				this.restart();
-			});
-		}
+		this.initializeInactivityTimeout(config);
+		this.initializeRestartTriggers();
 	}
 
 	/**
@@ -179,6 +147,54 @@ export default class BuildJob extends EventEmitter {
 
 	get options () {
 		return this._options;
+	}
+
+	initializeInactivityTimeout(config) {
+		const inactivityTimeout = config.inactivityTimeout;
+		this.on('state', (job, state) => {
+			if (this.inactivityTimeout !== null) {
+				clearTimeout(this.inactivityTimeout);
+			}
+			if (state === BuildJob.STATE_STOPPED) {
+				return;
+			}
+			this.inactivityTimeout = setTimeout(() => {
+				this.writeOutput(`No activity within the last ${prettyTime(inactivityTimeout)}, stopping Webpack task.`);
+				this.stop();
+			}, inactivityTimeout);
+		});
+	}
+
+	initializeRestartTriggers() {
+		if (!this.options.watch) {
+			return;
+		}
+
+		const restart = (reason) => {
+			if (this.state !== BuildJob.STATE_STOPPED) {
+				this.writeOutput(`Restarting due to ${reason}`);
+				this.restart();
+			}
+		};
+
+		const pluginContext = pluginService.createPluginContext({
+			cwd: this.projectPath,
+			options: this.options,
+		});
+		pluginContext.applyHook('watch').appliedValues.forEach(({ value: watchList }) => {
+			for (const file of watchList) {
+				const watcher = new FSWatcher(path.join(this.projectPath, file));
+				watcher.on('change', e => {
+					restart(`changes in ${file}`);
+				});
+			}
+		});
+		pluginContext.on('change', e => {
+			restart(`changes in plugin "${e.id}"`);
+		});
+		pluginContext.on('reload', e => {
+			restart('Plugin API reload');
+		});
 	}
 
 	async start() {

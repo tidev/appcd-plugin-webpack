@@ -1,3 +1,4 @@
+import 'v8-compile-cache';
 import { schema } from './options';
 import pluginService from '../plugin-api/service';
 import { registerHooks, validate } from '../utils';
@@ -15,7 +16,11 @@ process.once('message', data => {
 	registerHooks(pluginService);
 
 	const { project } = options;
-	const context = pluginService.createPluginContext(project.path, options);
+	const context = pluginService.createPluginContext({
+		cwd: project.path,
+		options,
+		isWorker: true
+	});
 	const name = process.argv[2];
 	const task = context.tasks[name];
 	if (!task) {

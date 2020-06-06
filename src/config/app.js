@@ -31,6 +31,7 @@ import {
  * @param {object} options Project options
  */
 export default (api, options) => {
+	api.watch(['tiapp.xml']);
 	api.chainWebpack(config => {
 		const outputDirectory = api.resolve('Resources');
 		const platformName = options.build.platform;

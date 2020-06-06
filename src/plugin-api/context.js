@@ -4,7 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import readPkg from 'read-pkg';
 
-import { interopRequireDefault, loadModule } from './loader';
+import { loadModule } from './loader';
 import PluginApi from './plugin-api';
 import { isPlugin, ProjectDiagnostics } from '../utils';
 
@@ -20,7 +20,7 @@ export default class PluginContext extends EventEmitter {
 	 * @param {string} cwd Current working directory of this plugin context.
 	 * @param {Object} options Options object that will passed to plugins.
 	 */
-	constructor(cwd, options) {
+	constructor({ cwd, builtInPlugins, isWorker, options }) {
 		super();
 
 		if (!fs.existsSync(cwd)) {
@@ -33,6 +33,18 @@ export default class PluginContext extends EventEmitter {
 		 * @type string
 		 */
 		this.cwd = cwd;
+		/**
+		 * Whether this plugin context is running inside a worker thread or not.
+		 *
+		 * When run as a worker, all automatic plugin reloading functionality is
+		 * disabled.
+		 */
+		this.isWorker = isWorker;
+		/**
+		 * True if this context should watch plugins for changes and automatically
+		 * reload them.
+		 */
+		this.shouldWatch = options.watch && !isWorker;
 		/**
 		 * package.json of the current working directory
 		 */
@@ -52,7 +64,7 @@ export default class PluginContext extends EventEmitter {
 		/**
 		 * List of built-in plugins
 		 */
-		this.builtInPlugins = [];
+		this.builtInPlugins = builtInPlugins;
 		/**
 		 * Map of plugin identifiers and their apply functions.
 		 *
@@ -79,8 +91,9 @@ export default class PluginContext extends EventEmitter {
 
 	initialize() {
 		this.readPkg();
-		this.builtInPlugins = this.resolveBuiltInPlugins();
+		console.time('resolveAndApplyPlugins');
 		this.resolveAndApplyPlugins();
+		console.timeEnd('resolveAndApplyPlugins');
 	}
 
 	/**
@@ -125,32 +138,8 @@ export default class PluginContext extends EventEmitter {
 		}
 	}
 
-	/**
-	 * Resolves built-in plugins.
-	 *
-	 * These will be loaded with the webpack plugin itself and don't need
-	 * fs-watching so we can use a simple require to load the apply function.
-	 *
-	 * @return {Array}
-	 */
-	resolveBuiltInPlugins() {
-		const idToPlugin = (id) => ({
-			id: id.replace(/^\.+\//, 'built-in:'),
-			// eslint-disable-next-line security/detect-non-literal-require
-			apply: interopRequireDefault(require(id))
-		});
-		return [
-			'../config/base',
-			'../config/prod',
-			'../config/app',
-			'../tasks/build',
-			'../tasks/serve'
-		].map(idToPlugin);
-	}
-
-	resolveAndApplyPlugins(inlinePlugins = [], useBuiltInPlugins = true) {
-		const builtInPlugins = useBuiltInPlugins ? this.builtInPlugins : [];
-		let plugins = [].concat(builtInPlugins);
+	resolveAndApplyPlugins(inlinePlugins = []) {
+		let plugins = [].concat(this.builtInPlugins);
 
 		if (inlinePlugins) {
 			plugins = plugins.concat(inlinePlugins);
@@ -158,8 +147,8 @@ export default class PluginContext extends EventEmitter {
 
 		this.readPkg();
 		const { cwd, pkg } = this;
-		const { watch } = this.options;
-		if (watch) {
+		const forceLoad = this.shouldWatch;
+		if (this.shouldWatch) {
 			const pkgPath = path.join(cwd, 'package.json');
 			const pkgWatcher = new FSWatcher(pkgPath);
 			pkgWatcher.on('change', () => {
@@ -177,8 +166,7 @@ export default class PluginContext extends EventEmitter {
 			.map(id => {
 				return {
 					id,
-					// eslint-disable-next-line security/detect-non-literal-require
-					apply: loadModule(id, cwd, true)
+					apply: loadModule(id, cwd, forceLoad)
 				};
 			});
 		plugins = plugins.concat(projectPlugins);
@@ -192,7 +180,7 @@ export default class PluginContext extends EventEmitter {
 
 			plugins = plugins.concat(files.map(file => {
 				const pluginId = `local:${file}`;
-				if (watch) {
+				if (this.shouldWatch) {
 					const fileWatcher = new FSWatcher(path.join(cwd, file));
 					fileWatcher.on('change', e => {
 						if (e.action === 'change') {
@@ -208,7 +196,7 @@ export default class PluginContext extends EventEmitter {
 
 				return {
 					id: pluginId,
-					apply: loadModule(`./${file}`, cwd, true)
+					apply: loadModule(`./${file}`, cwd, forceLoad)
 				};
 			}));
 		}
