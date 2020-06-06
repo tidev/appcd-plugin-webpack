@@ -9,7 +9,7 @@ class Diagnostics {
 
 	recordApiUsage(expression) {
 		this.symbols.add(expression.replace(/^(Ti|Titanium)\./, ''));
-		if (this.apiUsage[expression]) {
+		if (!this.apiUsage[expression]) {
 			this.apiUsage[expression] = 1;
 		} else {
 			this.apiUsage[expression]++;
@@ -32,17 +32,36 @@ export class ProjectDiagnostics {
 		diagnostics.recordApiUsage(expression);
 	}
 
-	send(fileList) {
+	send({ modified, removed, watchRun }) {
 		const allDiagnostics = [];
-		this.diagnostics.forEach((diagnostics, file) => {
-			if (!fileList || fileList.includes(file)) {
+		if (!watchRun) {
+			this.diagnostics.forEach((diagnostics, file) => {
 				allDiagnostics.push({
 					file,
 					symbols: [ ...diagnostics.symbols ],
 					apiUsage: diagnostics.apiUsage
 				});
+			});
+		} else {
+			for (const modifiedFile of modified) {
+				const diagnostics = this.diagnostics.get(modifiedFile);
+				if (diagnostics === undefined) {
+					continue;
+				}
+				allDiagnostics.push({
+					file: modifiedFile,
+					symbols: [ ...diagnostics.symbols ],
+					apiUsage: diagnostics.apiUsage
+				});
 			}
-		});
+			for (const removedFile of removed) {
+				allDiagnostics.push({
+					file: removedFile,
+					removed: true
+				});
+				this.diagnostics.delete(removedFile);
+			}
+		}
 		sendData('diagnostics', allDiagnostics);
 	}
 }

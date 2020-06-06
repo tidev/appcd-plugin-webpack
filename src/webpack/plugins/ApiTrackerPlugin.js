@@ -2,6 +2,9 @@ import path from 'path';
 
 import { isWindows, parseRequest } from '../../utils';
 
+/**
+ * Tracks usage of used Titanium APIs in all modules parsed by Webpack.
+ */
 export class ApiTrackerPlugin {
 	constructor(options) {
 		this.diagnostics = options.diagnostics;
@@ -9,13 +12,19 @@ export class ApiTrackerPlugin {
 		this.tiNodeRegExp = /^Ti(tanium)?\./;
 		this.cwd = options.cwd;
 		this.watchRun = false;
-		this.changedModules = [];
+		this.modifiedFiles = [];
+		this.removedFiles = [];
 	}
 
 	apply(compiler) {
 		compiler.hooks.invalid.tap('ApiTracker', () => {
 			this.watchRun = true;
-			this.changedModules = [];
+			this.modifiedFiles = [];
+			this.removedFiles = [];
+		});
+
+		compiler.hooks.watchRun.tap('ApiTracker', () => {
+			compiler.removedFiles.forEach(f => this.removedFiles.push(f));
 		});
 
 		compiler.hooks.compilation.tap(
@@ -51,14 +60,18 @@ export class ApiTrackerPlugin {
 
 				if (this.watchRun) {
 					normalModuleFactory.hooks.module.tap('ApiTracker', module => {
-						this.changedModules.push(this.resolvePath(module.userRequest));
+						this.modifiedFiles.push(this.resolvePath(module.userRequest));
 					});
 				}
 			}
 		);
 
 		compiler.hooks.done.tap('ApiTracker', () => {
-			this.diagnostics.send(this.watchRun ? this.changedModules : undefined);
+			this.diagnostics.send({
+				watchRun: this.watchRun,
+				modified: this.modifiedFiles,
+				removed: this.removedFiles
+			});
 		});
 	}
 
