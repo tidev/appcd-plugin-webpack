@@ -17,6 +17,10 @@ const DEFAULT_STATE = {
 	hasWarnings: false
 };
 
+/**
+ * Extension of the ProgressPlguin used to report extended progress data for
+ * the Web UI and the Titanium CLI.
+ */
 export class DashboardPlugin extends ProgressPlugin {
 	constructor(cwd) {
 		super();
@@ -78,8 +82,6 @@ export class DashboardPlugin extends ProgressPlugin {
 			this.sendProgress();
 
 			sendData('dashboard', { type: 'done', data: { ...this.state } });
-
-			console.log('Dashboard.done');
 		});
 	}
 

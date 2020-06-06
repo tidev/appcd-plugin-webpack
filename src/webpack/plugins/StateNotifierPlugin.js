@@ -1,5 +1,9 @@
 import { sendData } from '../../utils';
 
+/**
+ * Reports basic state changes of the Webpack build back to the parent
+ * Daemon plugin.
+ */
 export class StateNotifierPlugin {
 	apply(compiler) {
 		compiler.hooks.beforeCompile.tap('StateNotifier:beforeCompile', _compiler => {
