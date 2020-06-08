@@ -36,6 +36,18 @@ You can change the global configuration settings for this plugin in `~/.appceler
 }
 ```
 
+## FAQ
+
+### The Webpack build is stuck, how can i restart it?
+
+Building the app with the `--force` flag will restart the whole Webpack build process for the current project. You can also start/stop the build via the Web UI in the detail view for a specific build.
+
+If nothing else helps, try stopping the daemon with `appcd stop`, which will automatically stop all currently active Webpack builds as well.
+
+### How can I view log output?
+
+You can stream the log output from the daemon with `appcd logcat`. To display messages from the Webpack plugin only you can filter them using `appcd logcat "*webpack*"`.
+
 ## Endpoints
 
 This plugin registers the following endpoints:
