@@ -10,7 +10,9 @@ First make sure you have at least version 3.2.0+ of [appc-daemon](https://github
 npm i appcd -g
 ```
 
-> 💡 **NOTE:** If you use [appc-cli](https://docs.axway.com/bundle/Appcelerator_CLI_allOS_en/page/appcelerator_cli_getting_started.html) you don't need to install appcd globally. Just make sure you are at least on version 8.0 since it already includes appcd 3.2.0+.
+> 💡 **NOTE**
+>
+> If you use [appc-cli](https://docs.axway.com/bundle/Appcelerator_CLI_allOS_en/page/appcelerator_cli_getting_started.html) you don't need to install appcd globally. Just make sure you are at least on version 8.0 since it already includes appcd 3.2.0+.
 
 ### Install @appcd/plugin-webpack
 
@@ -20,7 +22,9 @@ The Webpack plugin for appcd manages all Webpack build tasks for your Titanium p
 npm i @appcd/plugin-webpack -g
 ```
 
-> 💡 **NOTE:** Installing the plugin with Yarn is not yet supported. You must use NPM to install the plugin or else appcd will not be able to find it.
+> 💡 **NOTE**
+>
+> Installing the plugin with Yarn is not supported. You must use NPM to install the plugin or else appcd will not be able to find it.
 
 ### Install Titanium SDK 9.1.0
 
@@ -30,7 +34,9 @@ Webpack support was first introduced with SDK version 9.1.0, so make sure you ar
 ti sdk install -b master
 ```
 
-> 💡 **NOTE:** The [PR](https://github.com/appcelerator/titanium_mobile/pull/11346) for Webpack support is not merged yet. For now you have to build the SDK locally from the PR branch if you want to try it out.
+> 💡 **NOTE**
+>
+> The [PR](https://github.com/appcelerator/titanium_mobile/pull/11346) for Webpack support is not merged yet. For now you have to build the SDK locally from the PR branch if you want to try it out.
 
 ### Install Project Plugins
 
@@ -67,7 +73,9 @@ module.exports = {
 
 The preset will be configured automatically for you by default, but you can easily overwrite options through the config file if you like. Take a look at the [options](https://github.com/appcelerator/babel-preset-app#options) to see what's available.
 
-> 💡 **NOTE:** Although we highly recommend using [`@titanium-sdk/babel-preset-app`](https://github.com/appcelerator/babel-preset-app) for Titanium Apps, you can use any other Babel presets or plugins if you like. Just be sure you know what you are doing since you need to configure them yourself.
+> 💡 **NOTE**
+>
+> Although we highly recommend using [`@titanium-sdk/babel-preset-app`](https://github.com/appcelerator/babel-preset-app) for Titanium Apps, you can use any other Babel presets or plugins if you like. Just be sure you know what you are doing since you need to configure them yourself.
 
 By default Webpack will **not** transpile anything from `node_modules`. However, you can explicitly include dependencies for transpilation in your `tiapp.xml`:
 
@@ -89,7 +97,11 @@ These are some general guidelines you should follow when using Webpack with Tita
 
 When bundling code with Webpack there are a few rules you need to follow in your `require`/`import` statements.
 
-> 💡 **NOTE:** Requires are resolved at build time on your local machine, not from the root directory of your final app bundle. This is the most notable difference to non Webpack builds, where all requires will be resolved at runtime. Keep this in mind and the transition to Webpack compatible `require`/`import` statements is a piece of cake!
+> 💡 **NOTE**
+>
+> Requires are resolved at build time on your local machine, not from the root directory of your final app bundle. This is the most notable difference to non Webpack builds, where all requires will be resolved at runtime.
+>
+> When you build your project for the first time after Webpack was enabled, you probably see a lot of errors about dependencies that were not found. But don't worry, Webpack explicitly lists which dependency was not found and in which files. A simple search & replace using the following rules will fix those errors in no time.
 
 #### Dynamic requires
 
@@ -138,7 +150,9 @@ To support the non-spec behavior of the Titanium `require` implementation, which
 
 Note that the folders are searched in order and the first match wins. Make sure to not have possible duplicates to avoid unexpected module resolution.
 
-> ⚠️ **WARNING:** Using a module style request to require your own source files is strongly discuraged when using Webpack. Support for this may be removed in future versions. Always use relative imports or make use of aliases.
+> ⚠️ **WARNING**
+>
+> Using a module style request to require your own source files is strongly discuraged when using Webpack. Support for this may be removed in future versions. Always use relative imports or make use of aliases.
 
 ### Aliases
 
@@ -165,7 +179,9 @@ to the project root `package.json`. After that you can delete the now unused `pa
 
 When using Webpack the use of platform specific files changes slightly. Instead of placing your resources in a platform specific subfolder, you need add the platform as a suffix to the filename.
 
-> 💡 **TIP:** This only applies to things that you `require`/`import` through Webpack. The `platform` folder for example is excempt from this new rule.
+> 💡 **TIP**
+>
+> This only applies to things that you `require`/`import` through Webpack. The `platform` folder for example is excempt from this new rule.
 
 How it used to be:
 
@@ -219,7 +235,9 @@ Webpack will now make sure to copy that file to your app and replace the require
 
 Once you have changed all references to assets in your app with `require`/`import` you can disable the automatic copying of all assets by disabling the pre-configured `copy-assets` plugin. See the [delete plugin](#delete-plugin) example below in the [Webpack Configuration](#webpack-configuration) section how to do that.
 
-> 💡 **TIP:** Make sure to require *all assets* you want in your app. To copy fonts, for example, import the font files.
+> 💡 **TIP**
+>
+> Make sure to require *all assets* you want in your app. To copy fonts, for example, import the font files.
 >
 > ```js
 > import '~/fonts/FontAwesome.otf'
@@ -253,7 +271,9 @@ After you have created the plugin file you need to activate it in your `package.
 }
 ```
 
-> 💡 **TIP:** The Webpack service will automatically watch local plugins for changes and restarts the Webpack build task to properly load updated config values.
+> 💡 **TIP**
+>
+> The Webpack service will automatically watch plugins for changes and restarts the Webpack build task to properly load updated config values.
 
 ### Examples
 
