@@ -85,7 +85,7 @@
     </v-content>
 
     <v-footer class="grey--text" app dark color="#0e1e24">
-      <span class="copyright">&copy; 2019 Axway Appcelerator</span>
+      <span class="copyright">&copy; {{ currentDate }} Axway Appcelerator</span>
     </v-footer>
   </v-app>
 </template>
@@ -121,6 +121,9 @@ export default {
     ...mapState(['connected']),
     miniVariant() {
       return this.$vuetify.breakpoint.mdAndDown
+    },
+    currentDate() {
+      return new Date().getFullYear()
     }
   }
 }
