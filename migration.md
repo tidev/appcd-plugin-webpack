@@ -120,7 +120,7 @@ import '/utils/file';
 import '@/utils/file';
 ```
 
-Absolute paths are _not_ resolve from the root directory of your final app bundle, instead they are resolved on your local machine. Use the `@/` [alias](#aliases) to refer to the source root directory of your project.
+Absolute paths are _not_ resolved from the root directory of your final app bundle, instead they are resolved on your local machine. Use the `@/` [alias](#aliases) to refer to the source root directory of your project.
 
 #### Module paths
 
@@ -153,36 +153,6 @@ To make your life easier when dealing with relative imports throughout your proj
 ### Using NPM modules
 
 You can install NPM modules directly into your project root directory and require them in your Titanium code. Webpack takes care of the rest and makes sure to properly resolve and bundle them into your app.
-
-### Advanced: Asset management
-
-For a simplified migration process, Webpack copies all assets from `src/assets` (Classic) or `app/assets` (Alloy) to your app by default. However, since [file-loader](https://github.com/webpack-contrib/file-loader) is already pre-configured you can make use of it if you'd like and disable the legacy copying of all asset. The main benefit of this is that you can chain more loaders into this process and, for example, automatically compress all used images by default to minify the size of your final App bundle.
-
-For example, let's assume you have an image view defined like this:
-
-```js
-Ti.UI.createImageView({
-  image: '/image.jpg'
-})
-```
-
-To use `file-loader` you simply need to `require` the image:
-
-```js
-const imageView = Ti.UI.createImageView({
-  image: require('@/assets/image.jpg')
-})
-```
-
-Webpack will now make sure to copy that file to your app and replace the require with the path pointing to the image within your app.
-
-Once you have changed all references to assets in your app with `require`/`import` you can disable the automatic copying of all assets by disabling the pre-configured `copy-assets` plugin. See the [delete plugin](#delete-plugin) example below in the [Webpack Configuration](#webpack-configuration) section how to do that.
-
-> 💡 **TIP:** Make sure to require *all assets* you want in your app. To copy fonts, for example, import the font files.
->
-> ```js
-> import '~/fonts/FontAwesome.otf'
-> ```
 
 ### Platform specific files
 
@@ -217,6 +187,36 @@ export const msg = 'This is used on Android'
 ```
 
 If no file with a platform suffix was found Webpack tries to resolve the file as usual without any suffix.
+
+### Advanced: Asset management
+
+For a simplified migration process, Webpack copies all assets from `src/assets` (Classic) or `app/assets` (Alloy) to your app by default. However, since [file-loader](https://github.com/webpack-contrib/file-loader) is already pre-configured you can make use of it if you'd like and disable the legacy copying of all asset. The main benefit of this is that you can chain more loaders into this process and, for example, automatically compress all used images by default to minify the size of your final App bundle.
+
+For example, let's assume you have an image view defined like this:
+
+```js
+Ti.UI.createImageView({
+  image: '/image.jpg'
+})
+```
+
+To use `file-loader` you simply need to `require` the image:
+
+```js
+const imageView = Ti.UI.createImageView({
+  image: require('@/assets/image.jpg')
+})
+```
+
+Webpack will now make sure to copy that file to your app and replace the require with the path pointing to the image within your app.
+
+Once you have changed all references to assets in your app with `require`/`import` you can disable the automatic copying of all assets by disabling the pre-configured `copy-assets` plugin. See the [delete plugin](#delete-plugin) example below in the [Webpack Configuration](#webpack-configuration) section how to do that.
+
+> 💡 **TIP:** Make sure to require *all assets* you want in your app. To copy fonts, for example, import the font files.
+>
+> ```js
+> import '~/fonts/FontAwesome.otf'
+> ```
 
 ## Webpack Configuration
 
