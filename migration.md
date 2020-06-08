@@ -154,6 +154,13 @@ To make your life easier when dealing with relative imports throughout your proj
 
 You can install NPM modules directly into your project root directory and require them in your Titanium code. Webpack takes care of the rest and makes sure to properly resolve and bundle them into your app.
 
+This means that you can move any dependencies you have in
+
+- Alloy: `app/lib/package.json`
+- Classic: `Resources/package.json`
+
+to the project root `package.json`. After that you can delete the now unused `package.json` file including the corrosponding `node_modules` from the above folders.
+
 ### Platform specific files
 
 When using Webpack the use of platform specific files changes slightly. Instead of placing your resources in a platform specific subfolder, you need add the platform as a suffix to the filename.
