@@ -91,9 +91,7 @@ export default class PluginContext extends EventEmitter {
 
 	initialize() {
 		this.readPkg();
-		console.time('resolveAndApplyPlugins');
 		this.resolveAndApplyPlugins();
-		console.timeEnd('resolveAndApplyPlugins');
 	}
 
 	/**
