@@ -95,13 +95,9 @@ These are some general guidelines you should follow when using Webpack with Tita
 
 ### `require`/`import` with Webpack
 
-When bundling code with Webpack there are a few rules you need to follow in your `require`/`import` statements.
+Requires are resolved at build time on your local machine, not from the root directory of your final app bundle. This is the most notable difference to non Webpack builds, where all requires will be resolved at runtime.
 
-> 💡 **NOTE**
->
-> Requires are resolved at build time on your local machine, not from the root directory of your final app bundle. This is the most notable difference to non Webpack builds, where all requires will be resolved at runtime.
->
-> When you build your project for the first time after Webpack was enabled, you probably see a lot of errors about dependencies that were not found. But don't worry, Webpack explicitly lists which dependency was not found and in which files. A simple search & replace using the following rules will fix those errors in no time.
+When you build your project for the first time after Webpack was enabled, you probably see a lot of errors about dependencies that were not found. But don't worry, Webpack explicitly lists which dependency was not found and in which files. A simple search & replace using the following rules will fix those errors in no time.
 
 #### Dynamic requires
 
