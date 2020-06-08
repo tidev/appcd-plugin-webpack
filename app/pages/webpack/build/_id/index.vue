@@ -142,7 +142,7 @@ export default {
       if (event === 'done') {
         this.$store.commit('webpack/addHistory', data.historyEntry)
       } else if (event === 'stats') {
-        this.$store.commit('webpack/stats', data)
+        this.$store.commit('webpack/stats', data.stats)
       } else {
         this.$store.commit('webpack/updateJob', data)
       }
