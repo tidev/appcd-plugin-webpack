@@ -156,7 +156,7 @@ To make your life easier when dealing with relative imports throughout your proj
 
 - `@`: project source directory
   - **Classic**: `src`
-  - **Alloy**: `app`
+  - **Alloy**: `app/lib`
   - **Vue.js**: `src`
   - **Angular**: `src`
 
