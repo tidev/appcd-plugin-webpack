@@ -24,7 +24,9 @@ export class ApiTrackerPlugin {
 		});
 
 		compiler.hooks.watchRun.tap('ApiTracker', () => {
-			compiler.removedFiles.forEach(f => this.removedFiles.push(f));
+			if (compiler.removedFiles) {
+				compiler.removedFiles.forEach(f => this.removedFiles.push(f));
+			}
 		});
 
 		compiler.hooks.compilation.tap(
