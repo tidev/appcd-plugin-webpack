@@ -21,7 +21,7 @@ export default class JobService extends Dispatcher {
 
 	async startWebpack(ctx) {
 		const { params, data: options } = ctx.request;
-		const jobIdentifier = params.identifier;
+		const jobIdentifier = params.identifier || options.identifier;
 		let job;
 		if (jobIdentifier && this.jobManager.hasJob(jobIdentifier)) {
 			job = this.jobManager.getJob(jobIdentifier);
