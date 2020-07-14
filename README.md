@@ -48,6 +48,12 @@ If nothing else helps, try stopping the daemon with `appcd stop`, which will aut
 
 You can stream the log output from the daemon with `appcd logcat`. To display messages from the Webpack plugin only you can filter them using `appcd logcat "*webpack*"`.
 
+### The build errors with "Not found", what should i do now?
+
+Make sure that you have the Webpack plugin installed and loaded. You can check the status of all currently installed plugins with `appcd status`.
+
+If the Webpack plugin shows up in that list but you still see the error, you may have to restart the Daemon. There is a known bug in the configuration system which can prevent the plugin from loading the first time after it was installed. In that case simply stop the daemon with `appcd stop` and build your app again.
+
 ## Endpoints
 
 This plugin registers the following endpoints:
