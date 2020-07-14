@@ -24,9 +24,9 @@
     "Jan Vennemann <jvennemann@axway.com>"
   ],
   "license": "Apache-2.0",
-  "homepage": "https://github.com/appcelerator/appc-daemon-plugins",
-  "bugs": "https://github.com/appcelerator/appc-daemon-plugins/issues",
-  "repository": "https://github.com/appcelerator/appc-daemon-plugins",
+  "homepage": "https://github.com/appcelerator/appcd-plugin-webpack#readme",
+  "bugs": "https://github.com/appcelerator/appcd-plugin-webpack/issues",
+  "repository": "https://github.com/appcelerator/appcd-plugin-webpack",
   "dependencies": {
     "@babel/core": "^7.9.6",
     "@hapi/joi": "^17.1.1",
