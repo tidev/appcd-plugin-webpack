@@ -36,6 +36,7 @@ export function formatAbsolutePathErrors (errors) {
 			grouped.length === 1 ? 'Absolute path require found' : 'Absolute path requires found',
 			'',
 			...grouped.map(formatGroup),
+			'',
 			'For absolute paths use the "@" alias at the start of your path to allow it to be resolved correctly',
 		];
 	}

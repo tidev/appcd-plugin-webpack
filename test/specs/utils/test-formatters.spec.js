@@ -15,6 +15,7 @@ describe('utils - formatters', () => {
 				'Absolute path require found',
 				'',
 				'* /permissions -> @/permissions in ./app/controllers/phone/cameraGallery.js',
+				'',
 				'For absolute paths use the "@" alias at the start of your path to allow it to be resolved correctly',
 			]);
 		});
@@ -41,6 +42,7 @@ describe('utils - formatters', () => {
 				'',
 				'* /permissions -> @/permissions in ./app/controllers/phone/cameraGallery.js',
 				'* /awesome-module -> @/awesome-module in ./app/controllers/phone/test.js',
+				'',
 				'For absolute paths use the "@" alias at the start of your path to allow it to be resolved correctly',
 			]);
 		});
@@ -74,6 +76,7 @@ describe('utils - formatters', () => {
 				'Absolute path require found',
 				'',
 				'* /permissions -> @/permissions in ./app/controllers/phone/cameraGallery.js, ./app/controllers/phone/test.js and 1 other',
+				'',
 				'For absolute paths use the "@" alias at the start of your path to allow it to be resolved correctly',
 			]);
 		});
