@@ -5,6 +5,8 @@ import path from 'path';
 import TerserPlugin from 'terser-webpack-plugin';
 
 import terserOptions from './terserOptions';
+import { formatAbsolutePathErrors } from '../utils/formatters';
+import { transformAbsolutePathErrors } from '../utils/transformers';
 
 export default (api, options) => {
 	const resolveLocal = (...args) => {
@@ -38,7 +40,13 @@ export default (api, options) => {
 
 		config.plugin('friendly-errors')
 			.use(FriendlyErrorsPlugin, [{
-				clearConsole: false
+				clearConsole: false,
+				additionalFormatters: [
+					formatAbsolutePathErrors
+				],
+				additionalTransformers: [
+					transformAbsolutePathErrors
+				]
 			}]);
 
 		// optimization ------------------------------------------------------------
