@@ -24,7 +24,7 @@ function formatFileList (files) {
 
 function formatGroup (group) {
 	const files = group.errors.map(e => e.file).filter(Boolean);
-	return `* ${group.module} -> @${group.module}${formatFileList(files)}`;
+	return `* ${group.module}${formatFileList(files)}, replace with @${group.module}`;
 }
 
 export function formatAbsolutePathErrors (errors) {

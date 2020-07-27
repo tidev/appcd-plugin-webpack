@@ -14,7 +14,7 @@ describe('utils - formatters', () => {
 			}])).to.deep.equal([
 				'Absolute path require found',
 				'',
-				'* /permissions -> @/permissions in ./app/controllers/phone/cameraGallery.js',
+				'* /permissions in ./app/controllers/phone/cameraGallery.js, replace with @/permissions',
 				'',
 				'For absolute paths use the "@" alias at the start of your path to allow it to be resolved correctly',
 			]);
@@ -40,8 +40,8 @@ describe('utils - formatters', () => {
 			}])).to.deep.equal([
 				'Absolute path requires found',
 				'',
-				'* /permissions -> @/permissions in ./app/controllers/phone/cameraGallery.js',
-				'* /awesome-module -> @/awesome-module in ./app/controllers/phone/test.js',
+				'* /permissions in ./app/controllers/phone/cameraGallery.js, replace with @/permissions',
+				'* /awesome-module in ./app/controllers/phone/test.js, replace with @/awesome-module',
 				'',
 				'For absolute paths use the "@" alias at the start of your path to allow it to be resolved correctly',
 			]);
@@ -75,7 +75,7 @@ describe('utils - formatters', () => {
 			}])).to.deep.equal([
 				'Absolute path require found',
 				'',
-				'* /permissions -> @/permissions in ./app/controllers/phone/cameraGallery.js, ./app/controllers/phone/test.js and 1 other',
+				'* /permissions in ./app/controllers/phone/cameraGallery.js, ./app/controllers/phone/test.js and 1 other, replace with @/permissions',
 				'',
 				'For absolute paths use the "@" alias at the start of your path to allow it to be resolved correctly',
 			]);
