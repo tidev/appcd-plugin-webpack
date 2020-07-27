@@ -1,3 +1,11 @@
+## [0.2.1](https://github.com/appcelerator/appcd-plugin-webpack/compare/v0.2.0...v0.2.1) (2020-07-27)
+
+
+### Features
+
+* add warning to highlight absolute require paths ([#17](https://github.com/appcelerator/appcd-plugin-webpack/issues/17)) ([ad66d5e](https://github.com/appcelerator/appcd-plugin-webpack/commit/ad66d5e0fd6c975f08f6abf29adc3dd6afd7e06f))
+
+
 # [0.2.0](https://github.com/appcelerator/appc-daemon-plugins/compare/v0.1.0...v0.2.0) (2020-07-10)
 
 ### Bug Fixes
