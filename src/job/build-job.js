@@ -183,7 +183,8 @@ export default class BuildJob extends EventEmitter {
 		});
 		pluginContext.applyHook('watch').appliedValues.forEach(({ value: watchList }) => {
 			for (const file of watchList) {
-				const watcher = new FSWatcher(path.join(this.projectPath, file));
+				const watchPath = path.isAbsolute(file) ? file : path.resolve(this.projectPath, file);
+				const watcher = new FSWatcher(watchPath);
 				watcher.on('change', e => {
 					restart(`changes in ${file}`);
 				});
