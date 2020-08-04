@@ -1,3 +1,11 @@
+## [0.2.2](https://github.com/appcelerator/appcd-plugin-webpack/compare/v0.2.1...v0.2.2) (2020-08-04)
+
+
+### Bug Fixes
+
+* handle absolute paths from watch hook ([2c3dcfb](https://github.com/appcelerator/appcd-plugin-webpack/commit/2c3dcfbe900d208cca1b4698a67150b1f3a08b72))
+
+
 ## [0.2.1](https://github.com/appcelerator/appcd-plugin-webpack/compare/v0.2.0...v0.2.1) (2020-07-27)
 
 
