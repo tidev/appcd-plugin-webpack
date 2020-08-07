@@ -255,10 +255,12 @@ export default class BuildJob extends EventEmitter {
 				}
 				case 'exit': {
 					this.pid = null;
-					if (data.code !== null && data.code !== 0) {
-						this.state = BuildJob.STATE_ERROR;
-					} else {
+					const code = data.code || 0;
+					const isWin = process.platform === 'win32';
+					if (code === 0 || (isWin && code === 1)) {
 						this.state = BuildJob.STATE_STOPPED;
+					} else {
+						this.state = BuildJob.STATE_ERROR;
 					}
 				}
 			}
