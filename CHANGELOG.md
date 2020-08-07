@@ -1,3 +1,12 @@
+## [0.2.3](https://github.com/appcelerator/appcd-plugin-webpack/compare/v0.2.2...v0.2.3) (2020-08-07)
+
+
+### Bug Fixes
+
+* **app:** distribute static folder ([#20](https://github.com/appcelerator/appcd-plugin-webpack/issues/20)) ([e1f0a4c](https://github.com/appcelerator/appcd-plugin-webpack/commit/e1f0a4c8b45c00cf416f781e07621dd87a56f1b5))
+* handle windows exit code after stopping build ([#19](https://github.com/appcelerator/appcd-plugin-webpack/issues/19)) ([6772e70](https://github.com/appcelerator/appcd-plugin-webpack/commit/6772e7082222627b87e902ddcbff4c242f0a55e9))
+
+
 ## [0.2.2](https://github.com/appcelerator/appcd-plugin-webpack/compare/v0.2.1...v0.2.2) (2020-08-04)
 
 
