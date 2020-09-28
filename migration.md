@@ -26,17 +26,13 @@ npm i @appcd/plugin-webpack -g
 >
 > Installing the plugin with Yarn is not supported. You must use NPM to install the plugin or else appcd will not be able to find it.
 
-### Install Titanium SDK 9.1.0
+### Install Titanium SDK 9.1.0+
 
 Webpack support was first introduced with SDK version 9.1.0, so make sure you are running the latest SDK.
 
 ```sh
-ti sdk install -b master
+ti sdk install latest
 ```
-
-> 💡 **NOTE**
->
-> The [PR](https://github.com/appcelerator/titanium_mobile/pull/11346) for Webpack support is not merged yet. For now you have to build the SDK locally from the PR branch if you want to try it out.
 
 ### Install Project Plugins
 
