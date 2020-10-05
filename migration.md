@@ -39,19 +39,19 @@ ti sdk install latest
 Now that you have the neccessary global tools installed you just need to enable Webpack in your project. Install `webpack` and one of the new Titanium SDK Webpack Plugins into your project.
 
 ```sh
-npm i webpack @titanium-sdk/webpack-plugin-<type> -D
+npm i webpack @titanium-sdk/webpack-plugin-<type> <other-deps> -D
 ```
+
+The exact install command varies depending on the project plugin you need to install. Please refer to the readme file of a plugin for detailed install instructions and additional migration steps. The following plugins are currently available:
+
+- [`@titanium-sdk/webpack-plugin-alloy`](https://github.com/appcelerator/webpack-plugin-alloy#readme)
+- [`@titanium-sdk/webpack-plugin-classic`](https://github.com/appcelerator/webpack-plugin-classic#readme)
 
 > 💡 **NOTE**
 >
 > If your project does not contain a `package.json` yet, create one before installing the project plugins with `npm init --yes`. The Titanium CLI will scan the dependencies listed in `package.json` for installed Webpack plugins and enable Webpack support if one of the supported project type plugins was found.
 
-The following plugins are currently available:
 
-- [`@titanium-sdk/webpack-plugin-alloy`](https://github.com/appcelerator/webpack-plugin-alloy#readme)
-- [`@titanium-sdk/webpack-plugin-classic`](https://github.com/appcelerator/webpack-plugin-classic#readme)
-
-Please see the readme file of a plugin for additional install instructions and migration steps.
 
 ### Configure Babel
 
