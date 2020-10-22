@@ -39,13 +39,13 @@ ti sdk install latest
 Now that you have the neccessary global tools installed you just need to enable Webpack in your project. First, let's start with installing `webpack` in your project. Note that webpack 5 is not supported yet, so you explicitly need to install webpack 4 for now.
 
 ```sh
-npm i webpack@^4.44.0
+npm i -D webpack@^4.44.0
 ```
 
 Now you can install the appropriate webpack plugin for your project:
 
 ```sh
-npm i @titanium-sdk/webpack-plugin-<type> <other-deps> -D
+npm i -D @titanium-sdk/webpack-plugin-<type> <other-deps>
 ```
 
 > ⚠️ **IMPORTANT**
