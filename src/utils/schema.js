@@ -20,7 +20,16 @@ export const buildSchema = joi.object({
 		.valid('device')
 		.required()
 		.when('platform', { is: 'android', then: joi.valid('emulator', 'dist-playstore') })
-		.when('platform', { is: 'ios', then: joi.valid('simulator', 'dist-appstore', 'dist-adhoc') }),
+		.when('platform', {
+			is: 'ios',
+			then: joi.valid(
+				'simulator',
+				'dist-appstore',
+				'dist-adhoc',
+				'macos',
+				'dist-macappstore'
+			)
+		}),
 	sdk: joi.object({
 		path: joi.string()
 			.required(),
